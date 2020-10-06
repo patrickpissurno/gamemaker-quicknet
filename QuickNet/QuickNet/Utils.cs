@@ -42,6 +42,105 @@ namespace QuickNet
                 return result.ToString();
             }
         }
+        
+        public static string EncodeArray(int[] array)
+        {
+            if (array.Length == 0)
+            {
+                return "";
+            }
+            else if (array.Length == 1)
+            {
+                return array[0].ToString();
+            }
+            else if (array.Length < 300)  // string builder is faster on larger arrays, but slower on smaller
+            {
+                var result = array[0].ToString();
+
+                for (var i = 1; i < array.Length; i++)
+                    result += ";" + array[i];
+
+                return result;
+            }
+            else
+            {
+                var result = new StringBuilder(array[0].ToString());
+
+                for (var i = 1; i < array.Length; i++)
+                {
+                    result.Append(";");
+                    result.Append(array[i]);
+                }
+
+                return result.ToString();
+            }
+        }
+
+        public static string EncodeArray(double[] array)
+        {
+            if (array.Length == 0)
+            {
+                return "";
+            }
+            else if (array.Length == 1)
+            {
+                return array[0].ToString();
+            }
+            else if (array.Length < 300)  // string builder is faster on larger arrays, but slower on smaller
+            {
+                var result = array[0].ToString();
+
+                for (var i = 1; i < array.Length; i++)
+                    result += ";" + array[i];
+
+                return result;
+            }
+            else
+            {
+                var result = new StringBuilder(array[0].ToString());
+
+                for (var i = 1; i < array.Length; i++)
+                {
+                    result.Append(";");
+                    result.Append(array[i]);
+                }
+
+                return result.ToString();
+            }
+        }
+
+        public static string EncodeArray(bool[] array)
+        {
+            if (array.Length == 0)
+            {
+                return "";
+            }
+            else if (array.Length == 1)
+            {
+                return (array[0] ? 1 : 0).ToString();
+            }
+            else if (array.Length < 300)  // string builder is faster on larger arrays, but slower on smaller
+            {
+                var result = (array[0] ? 1 : 0).ToString();
+
+                for (var i = 1; i < array.Length; i++)
+                    result += ";" + (array[i] ? 1 : 0);
+
+                return result;
+            }
+            else
+            {
+                var result = new StringBuilder((array[0] ? 1 : 0).ToString());
+
+                for (var i = 1; i < array.Length; i++)
+                {
+                    result.Append(";");
+                    result.Append(array[i] ? 1 : 0);
+                }
+
+                return result.ToString();
+            }
+        }
 
         public static string[] DecodeArray(string encoded)
         {
