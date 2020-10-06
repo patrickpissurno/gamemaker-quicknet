@@ -114,6 +114,22 @@ namespace QuickNet
                 return 1;
             }
         }
+        
+        [DllExport("server_queue_reliable_put_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePutBool(string key, double value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, ((int)value) == 1);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put_bool' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
 
         [DllExport("server_queue_reliable_put_array", CallingConvention = CallingConvention.Cdecl)]
         public static double ServerQueueReliablePutArray(string key, string value)
@@ -158,6 +174,22 @@ namespace QuickNet
             catch(Exception ex)
             {
                 Utils.Log("Function 'server_queue_reliable_put_array_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_queue_reliable_put_array_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePutArrayBool(string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, Utils.DecodeBoolArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put_array_bool' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }

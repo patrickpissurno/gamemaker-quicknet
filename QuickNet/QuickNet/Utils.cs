@@ -81,6 +81,19 @@ namespace QuickNet
             return result;
         }
 
+        public static bool[] DecodeBoolArray(string encoded)
+        {
+            if (encoded.Length == 0)
+                return new bool[] { };
+
+            var arr = encoded.Split(';');
+            var result = new bool[arr.Length];
+            for (var i = 0; i < arr.Length; i++)
+                result[i] = int.Parse(arr[i]) == 1;
+
+            return result;
+        }
+
         public static string Base64Encode(string data)
         {
             var bytes = Encoding.UTF8.GetBytes(data);

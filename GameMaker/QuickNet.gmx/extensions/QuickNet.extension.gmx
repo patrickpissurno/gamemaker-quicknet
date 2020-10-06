@@ -40,6 +40,7 @@
     <Resource>Scripts\qnet_server_queue_reliable_put_array_int</Resource>
     <Resource>Scripts\qnet_encode_array_number</Resource>
     <Resource>Scripts\qnet_decode_array_number</Resource>
+    <Resource>Scripts\qnet_server_queue_reliable_put_array_bool</Resource>
   </IncludedResources>
   <files>
     <file>
@@ -197,6 +198,30 @@
           <returnType>1</returnType>
           <argCount>-1</argCount>
           <args/>
+        </function>
+        <function>
+          <name>qnet_server_queue_reliable_put_bool</name>
+          <externalName>server_queue_reliable_put_bool</externalName>
+          <kind>12</kind>
+          <help>qnet_server_queue_reliable_put_bool(key, boolean)</help>
+          <returnType>2</returnType>
+          <argCount>2</argCount>
+          <args>
+            <arg>1</arg>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_queue_reliable_put_array_bool</name>
+          <externalName>server_queue_reliable_put_array_bool</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_queue_reliable_put_array_bool(encoded_array)</help>
+          <returnType>2</returnType>
+          <argCount>2</argCount>
+          <args>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
         </function>
       </functions>
       <constants/>
