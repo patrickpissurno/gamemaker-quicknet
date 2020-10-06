@@ -189,6 +189,15 @@
             <arg>1</arg>
           </args>
         </function>
+        <function>
+          <name>qnet_client_queue_poll</name>
+          <externalName>client_queue_poll</externalName>
+          <kind>12</kind>
+          <help>qnet_client_queue_poll()</help>
+          <returnType>1</returnType>
+          <argCount>-1</argCount>
+          <args/>
+        </function>
       </functions>
       <constants/>
     </file>

@@ -194,5 +194,20 @@ namespace QuickNet
                 return 1;
             }
         }
+
+        [DllExport("client_queue_poll", CallingConvention = CallingConvention.Cdecl)]
+        public static string ClientQueuePoll()
+        {
+            try
+            {
+                return Client.GetInstance().PollQueue() ?? "0";
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_queue_poll' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return "-1";
+            }
+        }
     }
 }

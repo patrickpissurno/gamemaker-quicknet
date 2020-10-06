@@ -82,6 +82,17 @@ namespace QuickNet
             server.DisconnectAll();
         }
 
+        private void CleanupAndReset()
+        {
+            server.Stop();
+            server = null;
+            listener = null;
+            mainThread = null;
+
+            stop = false;
+            started = false;
+        }
+
         public int GetConnectionsCount()
         {
             return server?.ConnectedPeersCount ?? 0;
@@ -103,22 +114,51 @@ namespace QuickNet
             reliableOutboundQueue.Enqueue((key, value));
         }
 
-        private void CleanupAndReset()
-        {
-            server.Stop();
-            server = null;
-            listener = null;
-            mainThread = null;
-
-            stop = false;
-            started = false;
-        }
-
         private void MainThread()
         {
             while (!stop)
             {
                 server.PollEvents();
+
+                if(server.ConnectedPeersCount < 1)
+                {
+                    while (reliableOutboundQueue.TryDequeue(out var _)); // no peers connected, just empty the queue
+                }
+                else
+                {
+                    var writer = new NetDataWriter();
+
+                    (string key, object data) t = (null, null);
+                    while(reliableOutboundQueue.TryDequeue(out t))
+                    {
+                        byte type;
+                        if (t.data is string _string)
+                        {
+                            type = (byte)DataType.STRING;
+                            writer.Put(type);
+                            writer.Put(_string);
+                        }
+                        else if (t.data is int _int)
+                        {
+                            type = (byte)DataType.INT;
+                            writer.Put(type);
+                            writer.Put(_int);
+                        }
+                        else if (t.data is double _double)
+                        {
+                            type = (byte)DataType.DOUBLE;
+                            writer.Put(type);
+                            writer.Put(_double);
+                        }
+                        else
+                            continue;
+
+                        writer.Put(t.key); //TODO: optimize the size needed to transmit the key
+                    }
+
+                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                }
+
                 Thread.Sleep(15);
             }
 

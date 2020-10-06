@@ -1,4 +1,6 @@
 ﻿using LiteNetLib;
+using System;
+using System.Collections.Concurrent;
 using System.Threading;
 
 namespace QuickNet
@@ -22,10 +24,14 @@ namespace QuickNet
         private bool started = false;
         private bool stop = false;
 
+        private ConcurrentQueue<(string key, string data)> inboundQueue;
+
         public void Connect(string ip, string port)
         {
             if (started)
                 return;
+
+            inboundQueue = new ConcurrentQueue<(string key, string data)>();
 
             listener = new EventBasedNetListener();
             client = new NetManager(listener);
@@ -34,12 +40,7 @@ namespace QuickNet
 
             started = true;
 
-            listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod) =>
-            {
-                //Console.WriteLine("We got: {0}", dataReader.GetString(100 /* max length of string */));
-                dataReader.Recycle();
-            };
-
+            listener.NetworkReceiveEvent += NetworkReceived;
             listener.NetworkErrorEvent += (s, e) => Disconnect();
 
             mainThread = new Thread(MainThread) { IsBackground = true };
@@ -64,6 +65,60 @@ namespace QuickNet
 
             stop = false;
             started = false;
+        }
+
+        public string PollQueue()
+        {
+            (string key, string data) t = (null, null);
+
+            if (inboundQueue?.TryDequeue(out t) == true)
+            {
+                return $"{t.key}={t.data}";
+            }
+            return null;
+        }
+
+        private void NetworkReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+        {
+            try
+            {
+                string key;
+                DataType type;
+                string data;
+
+                while (!reader.EndOfData)
+                {
+                    type = (DataType)reader.GetByte();
+
+                    switch (type)
+                    {
+                        case DataType.STRING:
+                            data = reader.GetString();
+                            break;
+                        case DataType.INT:
+                            data = reader.GetInt().ToString();
+                            break;
+                        case DataType.DOUBLE:
+                            data = reader.GetDouble().ToString();
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    key = reader.GetString(); //TODO: optimize the size needed to transmit the key
+
+                    inboundQueue.Enqueue((key, data));
+                }
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("[NetworkReceived] thrown an exception. Stack:");
+                Utils.Log(ex);
+            }
+            finally
+            {
+                reader.Recycle();
+            }
         }
 
         private void MainThread()
