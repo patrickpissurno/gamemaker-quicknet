@@ -3,7 +3,7 @@
   <name>QuickNet</name>
   <version>1.0.0</version>
   <packageID></packageID>
-  <ProductID>ACBD3CFF4E539AD869A0E8E3B4B022DD</ProductID>
+  <ProductID></ProductID>
   <date>06/10/20</date>
   <license>Free to use, also for commercial games.</license>
   <description></description>
@@ -46,10 +46,32 @@
       <ProxyFiles/>
       <functions>
         <function>
-          <name>qnet_start_server</name>
-          <externalName>StartServer</externalName>
+          <name>qnet_server_start</name>
+          <externalName>server_start</externalName>
           <kind>12</kind>
-          <help>qnet_start_server(ip, port)</help>
+          <help>qnet_server_start(ip, port, max_connections)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>1</arg>
+            <arg>1</arg>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
+          <name>qnet_server_stop</name>
+          <externalName>server_stop</externalName>
+          <kind>12</kind>
+          <help>qnet_server_stop()</help>
+          <returnType>2</returnType>
+          <argCount>-1</argCount>
+          <args/>
+        </function>
+        <function>
+          <name>qnet_client_connect</name>
+          <externalName>client_connect</externalName>
+          <kind>12</kind>
+          <help>qnet_client_connect(ip, port)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -57,7 +79,41 @@
             <arg>1</arg>
           </args>
         </function>
+        <function>
+          <name>qnet_client_disconnect</name>
+          <externalName>client_disconnect</externalName>
+          <kind>12</kind>
+          <help>qnet_client_disconnect()</help>
+          <returnType>2</returnType>
+          <argCount>0</argCount>
+          <args/>
+        </function>
+        <function>
+          <name>qnet_server_get_connections_count</name>
+          <externalName>server_get_connections_count</externalName>
+          <kind>12</kind>
+          <help>qnet_server_get_connections_count()</help>
+          <returnType>2</returnType>
+          <argCount>0</argCount>
+          <args/>
+        </function>
       </functions>
+      <constants/>
+    </file>
+    <file>
+      <filename>LiteNetLib.dll</filename>
+      <origname>extensions\LiteNetLib.dll</origname>
+      <init></init>
+      <final></final>
+      <kind>1</kind>
+      <uncompress>0</uncompress>
+      <ConfigOptions>
+        <Config name="Default">
+          <CopyToMask>1048640</CopyToMask>
+        </Config>
+      </ConfigOptions>
+      <ProxyFiles/>
+      <functions/>
       <constants/>
     </file>
   </files>
