@@ -29,7 +29,10 @@
     </Config>
   </ConfigOptions>
   <androidPermissions/>
-  <IncludedResources/>
+  <IncludedResources>
+    <Resource>Scripts\qnet_parse_data</Resource>
+    <Resource>Scripts\qnet_decode_array</Resource>
+  </IncludedResources>
   <files>
     <file>
       <filename>QuickNet.dll</filename>

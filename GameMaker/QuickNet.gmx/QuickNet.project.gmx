@@ -14,6 +14,8 @@
     <scripts name="utils">
       <script>scripts\get_text_cursor.gml</script>
     </scripts>
+    <script>scripts\qnet_parse_data.gml</script>
+    <script>scripts\qnet_decode_array.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\f_arial_18</font>
