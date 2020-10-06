@@ -55,5 +55,12 @@ namespace QuickNet
 
             return (key, data);
         }
+
+        private enum DataType : byte
+        {
+            STRING = 0,
+            INT = 1,
+            DOUBLE = 2,
+        }
     }
 }
