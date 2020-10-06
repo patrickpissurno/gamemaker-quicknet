@@ -32,6 +32,8 @@
   <IncludedResources>
     <Resource>Scripts\qnet_parse_data</Resource>
     <Resource>Scripts\qnet_decode_array</Resource>
+    <Resource>Scripts\qnet_key_is_array</Resource>
+    <Resource>Scripts\qnet_key_is_map</Resource>
   </IncludedResources>
   <files>
     <file>

@@ -16,6 +16,8 @@
     </scripts>
     <script>scripts\qnet_parse_data.gml</script>
     <script>scripts\qnet_decode_array.gml</script>
+    <script>scripts\qnet_key_is_array.gml</script>
+    <script>scripts\qnet_key_is_map.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\f_arial_18</font>
