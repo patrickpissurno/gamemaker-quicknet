@@ -16,10 +16,14 @@
     </scripts>
     <script>scripts\qnet_parse_data.gml</script>
     <script>scripts\qnet_encode_array.gml</script>
+    <script>scripts\qnet_encode_array_number.gml</script>
     <script>scripts\qnet_decode_array.gml</script>
+    <script>scripts\qnet_decode_array_number.gml</script>
     <script>scripts\qnet_key_is_array.gml</script>
     <script>scripts\qnet_key_is_map.gml</script>
     <script>scripts\qnet_server_queue_reliable_put_array.gml</script>
+    <script>scripts\qnet_server_queue_reliable_put_array_float.gml</script>
+    <script>scripts\qnet_server_queue_reliable_put_array_int.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\f_arial_18</font>

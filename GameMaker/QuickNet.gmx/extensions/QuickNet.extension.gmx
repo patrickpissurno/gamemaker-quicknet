@@ -36,6 +36,10 @@
     <Resource>Scripts\qnet_key_is_map</Resource>
     <Resource>Scripts\qnet_encode_array</Resource>
     <Resource>Scripts\qnet_server_queue_reliable_put_array</Resource>
+    <Resource>Scripts\qnet_server_queue_reliable_put_array_float</Resource>
+    <Resource>Scripts\qnet_server_queue_reliable_put_array_int</Resource>
+    <Resource>Scripts\qnet_encode_array_number</Resource>
+    <Resource>Scripts\qnet_decode_array_number</Resource>
   </IncludedResources>
   <files>
     <file>
@@ -154,6 +158,30 @@
           <externalName>server_queue_reliable_put_array</externalName>
           <kind>12</kind>
           <help>_qnet_server_queue_reliable_put_array(key, encoded_array)</help>
+          <returnType>2</returnType>
+          <argCount>2</argCount>
+          <args>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_queue_reliable_put_array_float</name>
+          <externalName>server_queue_reliable_put_array_float</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_queue_reliable_put_array_float(encoded_array)</help>
+          <returnType>2</returnType>
+          <argCount>2</argCount>
+          <args>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_queue_reliable_put_array_int</name>
+          <externalName>server_queue_reliable_put_array_int</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_queue_reliable_put_array_int(encoded_array)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>

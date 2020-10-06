@@ -55,6 +55,32 @@ namespace QuickNet
             return arr;
         }
 
+        public static double[] DecodeDoubleArray(string encoded)
+        {
+            if (encoded.Length == 0)
+                return new double[] { };
+
+            var arr = encoded.Split(';');
+            var result = new double[arr.Length];
+            for (var i = 0; i < arr.Length; i++)
+                result[i] = double.Parse(arr[i]);
+
+            return result;
+        }
+        
+        public static int[] DecodeIntArray(string encoded)
+        {
+            if (encoded.Length == 0)
+                return new int[] { };
+
+            var arr = encoded.Split(';');
+            var result = new int[arr.Length];
+            for (var i = 0; i < arr.Length; i++)
+                result[i] = int.Parse(arr[i]);
+
+            return result;
+        }
+
         public static string Base64Encode(string data)
         {
             var bytes = Encoding.UTF8.GetBytes(data);

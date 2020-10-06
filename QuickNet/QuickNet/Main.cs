@@ -125,7 +125,39 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_int' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_queue_reliable_put_array' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_queue_reliable_put_array_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePutArrayFloat(string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, Utils.DecodeDoubleArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put_array_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+        
+        [DllExport("server_queue_reliable_put_array_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePutArrayInt(string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, Utils.DecodeIntArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put_array_int' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
