@@ -52,8 +52,8 @@ namespace QuickNet
             }
         }
 
-        [DllExport("server_poll_queue", CallingConvention = CallingConvention.Cdecl)]
-        public static string ServerPollQueue()
+        [DllExport("server_queue_poll", CallingConvention = CallingConvention.Cdecl)]
+        public static string ServerQueuePoll()
         {
             try
             {

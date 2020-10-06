@@ -103,12 +103,12 @@
           <args/>
         </function>
         <function>
-          <name>qnet_server_poll_queue</name>
-          <externalName>server_poll_queue</externalName>
+          <name>qnet_server_queue_poll</name>
+          <externalName>server_queue_poll</externalName>
           <kind>12</kind>
-          <help>qnet_server_poll_queue()</help>
+          <help>qnet_server_queue_poll()</help>
           <returnType>1</returnType>
-          <argCount>0</argCount>
+          <argCount>-1</argCount>
           <args/>
         </function>
       </functions>
