@@ -122,38 +122,14 @@ namespace QuickNet
 
                 if(server.ConnectedPeersCount < 1)
                 {
-                    while (reliableOutboundQueue.TryDequeue(out var _)); // no peers connected, just empty the queue
+                    while (reliableOutboundQueue.TryDequeue(out _)); // no peers connected, just empty the queue
                 }
                 else
                 {
                     var writer = new NetDataWriter();
-
-                    (string key, object data) t = (null, null);
-                    while(reliableOutboundQueue.TryDequeue(out t))
+                    while (reliableOutboundQueue.TryDequeue(out var t))
                     {
-                        byte type;
-                        if (t.data is string _string)
-                        {
-                            type = (byte)DataType.STRING;
-                            writer.Put(type);
-                            writer.Put(_string);
-                        }
-                        else if (t.data is int _int)
-                        {
-                            type = (byte)DataType.INT;
-                            writer.Put(type);
-                            writer.Put(_int);
-                        }
-                        else if (t.data is double _double)
-                        {
-                            type = (byte)DataType.DOUBLE;
-                            writer.Put(type);
-                            writer.Put(_double);
-                        }
-                        else
-                            continue;
-
-                        writer.Put(t.key); //TODO: optimize the size needed to transmit the key
+                        Serializer.SerializeData(writer, t);
                     }
 
                     server.SendToAll(writer, DeliveryMethod.ReliableOrdered);

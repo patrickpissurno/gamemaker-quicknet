@@ -82,32 +82,12 @@ namespace QuickNet
         {
             try
             {
-                string key;
-                DataType type;
-                string data;
-
                 while (!reader.EndOfData)
                 {
-                    type = (DataType)reader.GetByte();
 
-                    switch (type)
-                    {
-                        case DataType.STRING:
-                            data = reader.GetString();
-                            break;
-                        case DataType.INT:
-                            data = reader.GetInt().ToString();
-                            break;
-                        case DataType.DOUBLE:
-                            data = reader.GetDouble().ToString();
-                            break;
-                        default:
-                            continue;
-                    }
-
-                    key = reader.GetString(); //TODO: optimize the size needed to transmit the key
-
-                    inboundQueue.Enqueue((key, data));
+                    var data = Serializer.DeserializeData(reader);
+                    if(data != null)
+                        inboundQueue.Enqueue(((string key, string data))data);
                 }
             }
             catch(Exception ex)
