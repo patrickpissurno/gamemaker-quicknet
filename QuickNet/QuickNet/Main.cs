@@ -52,6 +52,21 @@ namespace QuickNet
             }
         }
 
+        [DllExport("server_poll_queue", CallingConvention = CallingConvention.Cdecl)]
+        public static string ServerPollQueue()
+        {
+            try
+            {
+                return Server.GetInstance().PollQueue() ?? "0";
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_poll_queue' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return "-1";
+            }
+        }
+
         [DllExport("client_connect", CallingConvention = CallingConvention.Cdecl)]
         public static double ClientConnect(string ip, string port)
         {

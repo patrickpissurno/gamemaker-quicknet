@@ -1,6 +1,7 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Threading;
 
@@ -25,10 +26,14 @@ namespace QuickNet
         private bool started = false;
         private bool stop = false;
 
+        private ConcurrentQueue<(string key, string data)> inboundQueue;
+
         public void Start(string ip, string port, int maxConnections)
         {
             if (started)
                 return;
+
+            inboundQueue = new ConcurrentQueue<(string key, string data)>();
 
             listener = new EventBasedNetListener();
             server = new NetManager(listener);
@@ -36,6 +41,8 @@ namespace QuickNet
             server.Start(IPAddress.Parse(ip), IPAddress.IPv6None, int.Parse(port));
 
             started = true;
+
+            inboundQueue.Enqueue(("started", "true"));
 
             listener.ConnectionRequestEvent += request =>
             {
@@ -47,10 +54,17 @@ namespace QuickNet
 
             listener.PeerConnectedEvent += peer =>
             {
+                inboundQueue.Enqueue(("new_connection", peer.Id.ToString()));
+
                 //Console.WriteLine("We got connection: {0}", peer.EndPoint); // Show peer ip
                 //NetDataWriter writer = new NetDataWriter();                 // Create writer class
                 //writer.Put("Hello client!");                                // Put some string
                 //peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+            };
+
+            listener.PeerDisconnectedEvent += (peer, e) =>
+            {
+                inboundQueue.Enqueue(("disconnected", peer.Id.ToString()));
             };
 
             mainThread = new Thread(MainThread) { IsBackground = true };
@@ -69,6 +83,17 @@ namespace QuickNet
         public int GetConnectionsCount()
         {
             return server?.ConnectedPeersCount ?? 0;
+        }
+
+        public string PollQueue()
+        {
+            (string key, string data) t = (null, null);
+
+            if(inboundQueue?.TryDequeue(out t) == true)
+            {
+                return $"{t.key}={t.data}";
+            }
+            return null;
         }
 
         private void CleanupAndReset()

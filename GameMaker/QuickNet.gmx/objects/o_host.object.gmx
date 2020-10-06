@@ -73,6 +73,22 @@ connections_count = 0;
           <argument>
             <kind>1</kind>
             <string>connections_count = qnet_server_get_connections_count();
+
+var data = "";
+
+do {
+    data = qnet_server_poll_queue();
+    if(data == "0" || data == "-1") //"0" means empty, "-1" means error
+        continue;
+        
+    var i = string_pos('=', data);
+    
+    var key = string_copy(data, 1, i - 1);
+    var value = string_copy(data, i + 1, string_length(data) - i + 1);
+    
+    show_debug_message("KEY: '" + key + "', VALUE: '" + value + "'");
+}
+until(data != "");
 </string>
           </argument>
         </arguments>
