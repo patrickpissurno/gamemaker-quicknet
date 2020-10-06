@@ -27,6 +27,7 @@ namespace QuickNet
         private bool stop = false;
 
         private ConcurrentQueue<(string key, string data)> inboundQueue;
+        private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
 
         public void Start(string ip, string port, int maxConnections)
         {
@@ -34,6 +35,7 @@ namespace QuickNet
                 return;
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
+            reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
 
             listener = new EventBasedNetListener();
             server = new NetManager(listener);
@@ -94,6 +96,11 @@ namespace QuickNet
                 return $"{t.key}={t.data}";
             }
             return null;
+        }
+
+        public void ReliablePut(string key, object value)
+        {
+            reliableOutboundQueue.Enqueue((key, value));
         }
 
         private void CleanupAndReset()

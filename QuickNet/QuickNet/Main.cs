@@ -61,9 +61,73 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_poll_queue' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_queue_poll' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return "-1";
+            }
+        }
+
+        [DllExport("server_queue_reliable_put", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePut(string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, value);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_queue_reliable_put_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePutFloat(string key, double value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, value);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_queue_reliable_put_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePutInt(string key, double value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, (int)value);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_queue_reliable_put_array", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerQueueReliablePutArray(string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePut(key, Utils.DecodeArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_queue_reliable_put_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
             }
         }
 

@@ -43,6 +43,18 @@ namespace QuickNet
             }
         }
 
+        public static string[] DecodeArray(string encoded)
+        {
+            if (encoded.Length == 0)
+                return new string[] { };
+
+            var arr = encoded.Split(';');
+            for (var i = 0; i < arr.Length; i++)
+                arr[i] = Base64Decode(arr[i]);
+
+            return arr;
+        }
+
         public static string Base64Encode(string data)
         {
             var bytes = Encoding.UTF8.GetBytes(data);
