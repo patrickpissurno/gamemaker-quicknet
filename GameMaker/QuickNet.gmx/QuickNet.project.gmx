@@ -10,11 +10,23 @@
   <sprites name="sprites"/>
   <backgrounds name="background"/>
   <paths name="paths"/>
+  <scripts name="scripts">
+    <scripts name="utils">
+      <script>scripts\get_text_cursor.gml</script>
+    </scripts>
+  </scripts>
+  <fonts name="fonts">
+    <font>fonts\f_arial_18</font>
+  </fonts>
   <objects name="objects">
-    <object>objects\o_main</object>
+    <object>objects\o_menu</object>
+    <object>objects\o_host</object>
+    <object>objects\o_client</object>
   </objects>
   <rooms name="rooms">
-    <room>rooms\r_main</room>
+    <room>rooms\r_menu</room>
+    <room>rooms\r_host</room>
+    <room>rooms\r_client</room>
   </rooms>
   <help>
     <rtf>help.rtf</rtf>

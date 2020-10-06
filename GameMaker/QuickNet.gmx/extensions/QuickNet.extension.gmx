@@ -46,14 +46,15 @@
       <ProxyFiles/>
       <functions>
         <function>
-          <name>qnet_square</name>
-          <externalName>Square</externalName>
+          <name>qnet_start_server</name>
+          <externalName>StartServer</externalName>
           <kind>12</kind>
-          <help>qnet_square(x)</help>
+          <help>qnet_start_server(ip, port)</help>
           <returnType>2</returnType>
-          <argCount>1</argCount>
+          <argCount>2</argCount>
           <args>
-            <arg>2</arg>
+            <arg>1</arg>
+            <arg>1</arg>
           </args>
         </function>
       </functions>
