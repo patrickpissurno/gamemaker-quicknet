@@ -30,10 +30,12 @@
         {
             const byte garbage = 0x3F; //00111111
 
-            //size math is the same as Math.Ceiling(0.75f * data.length)
             var data_len = data.Length;
+
+            //size math is the same as Math.Ceiling(0.75f * data.length)
             var size = data_len * 3;
-            size = (size % 4 == 0 ? 0 : 1) + (size / 4);
+            var size_r = size % 4;
+            size = ((size_r | (size_r >> 1)) & 1) + (size >> 2);
 
             var buffer = new byte[size];
 
