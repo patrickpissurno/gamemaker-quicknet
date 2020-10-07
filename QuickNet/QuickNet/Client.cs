@@ -23,6 +23,7 @@ namespace QuickNet
         private Thread mainThread;
         private bool started = false;
         private bool stop = false;
+        private int id = -1;
 
         private ConcurrentQueue<(string key, string data)> inboundQueue;
 
@@ -30,6 +31,8 @@ namespace QuickNet
         {
             if (started)
                 return;
+
+            id = -1;
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
 
@@ -78,6 +81,11 @@ namespace QuickNet
             return null;
         }
 
+        public int GetId()
+        {
+            return id;
+        }
+
         private void NetworkReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
             try
@@ -86,8 +94,13 @@ namespace QuickNet
                 {
 
                     var data = Serializer.DeserializeData(reader);
-                    if(data != null)
+                    if (data != null)
+                    {
+                        if (id == -1 && data.Value.key == "connected_id")
+                            id = int.Parse(data.Value.data);
+
                         inboundQueue.Enqueue(((string key, string data))data);
+                    }
                 }
             }
             catch(Exception ex)

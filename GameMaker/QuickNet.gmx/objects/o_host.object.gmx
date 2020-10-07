@@ -166,10 +166,10 @@ do {
         
             // create a player for that client
             var player = qnet_server_instance_create(room_width / 2, room_height / 2, o_player);
-            player.player_id = real(value) + 1;
+            player.player_id = real(value);
             break;
         case "disconnected":
-            var player_id = real(value) + 1;
+            var player_id = real(value);
             for(var i = 0; i &lt; instance_number(o_player); i++)
             {
                 var player = instance_find(o_player, i);
@@ -257,7 +257,7 @@ draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 draw_set_font(f_arial_18);
 
-draw_text(20, 20, "Host (" + global.ip + ":" + global.port + ")#Online: " + string(connections_count + 1));
+draw_text(20, 20, "Host (" + global.ip + ":" + global.port + ")#Online: " + string(connections_count + 1) + "#Player ID: 0 (Host)");
 </string>
           </argument>
         </arguments>

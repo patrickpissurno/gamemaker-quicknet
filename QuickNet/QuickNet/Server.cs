@@ -56,17 +56,16 @@ namespace QuickNet
 
             listener.PeerConnectedEvent += peer =>
             {
-                inboundQueue.Enqueue(("new_connection", peer.Id.ToString()));
+                inboundQueue.Enqueue(("new_connection", (peer.Id + 1).ToString()));
 
-                //Console.WriteLine("We got connection: {0}", peer.EndPoint); // Show peer ip
-                //NetDataWriter writer = new NetDataWriter();                 // Create writer class
-                //writer.Put("Hello client!");                                // Put some string
-                //peer.Send(writer, DeliveryMethod.ReliableOrdered);             // Send with reliability
+                var writer = new NetDataWriter();
+                Serializer.SerializeData(writer, ("connected_id", peer.Id + 1));
+                peer.Send(writer, DeliveryMethod.ReliableOrdered);
             };
 
             listener.PeerDisconnectedEvent += (peer, e) =>
             {
-                inboundQueue.Enqueue(("disconnected", peer.Id.ToString()));
+                inboundQueue.Enqueue(("disconnected", (peer.Id + 1).ToString()));
             };
 
             mainThread = new Thread(MainThread) { IsBackground = true };

@@ -208,7 +208,8 @@ draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 draw_set_font(f_arial_18);
 
-draw_text(20, 20, "Client (" + global.ip + ":" + global.port + ")#Online: " + string(online_count));
+var player_id = qnet_client_get_id();
+draw_text(20, 20, "Client (" + global.ip + ":" + global.port + ")#Online: " + string(online_count) + "#Player ID: " + string(player_id));
 </string>
           </argument>
         </arguments>

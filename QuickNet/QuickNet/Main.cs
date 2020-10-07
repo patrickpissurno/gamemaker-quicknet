@@ -241,5 +241,20 @@ namespace QuickNet
                 return "-1";
             }
         }
+
+        [DllExport("client_get_id", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientGetId()
+        {
+            try
+            {
+                return Client.GetInstance().GetId();
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_get_id' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return -1;
+            }
+        }
     }
 }
