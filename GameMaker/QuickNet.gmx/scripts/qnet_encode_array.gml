@@ -13,7 +13,7 @@ else
 {
     var result = base64_encode(argument0[0]);
     
-    for(var i = 0; i < len; i += 1)
+    for(var i = 1; i < len; i += 1)
         result += ";" + base64_encode(argument0[i]);
         
     return result;    

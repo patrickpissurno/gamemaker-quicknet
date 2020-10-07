@@ -25,8 +25,17 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>qnet_server_start(global.ip, global.port, 10);
+            <string>global.is_host = true;
+qnet_server_start(global.ip, global.port, 10);
 connections_count = 0;
+
+global.ds_map_x = ds_map_create();
+global.ds_map_y = ds_map_create();
+
+var player = instance_create(room_width / 2, room_height / 2, o_player);
+player.player_id = 0;
+
+alarm[11] = 10;
 </string>
           </argument>
         </arguments>
@@ -50,6 +59,61 @@ connections_count = 0;
           <argument>
             <kind>1</kind>
             <string>qnet_server_stop();
+
+ds_map_destroy(global.ds_map_x);
+ds_map_destroy(global.ds_map_y);
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="2" enumb="11">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Re-schedule the alarm
+alarm[11] = 2;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Send data
+qnet_server_queue_reliable_put_int("online_count", connections_count + 1);
+
+for(var key = ds_map_find_first(global.ds_map_x); !is_undefined(key); key = ds_map_find_next(global.ds_map_x, key))
+    qnet_server_queue_reliable_put_float("ds_map_x{" + key + "}", global.ds_map_x[? key]);
+
+for(var key = ds_map_find_first(global.ds_map_y); !is_undefined(key); key = ds_map_find_next(global.ds_map_y, key))
+    qnet_server_queue_reliable_put_float("ds_map_y{" + key + "}", global.ds_map_y[? key]);
 </string>
           </argument>
         </arguments>
@@ -75,7 +139,7 @@ connections_count = 0;
             <string>///Receive and process data
 connections_count = qnet_server_get_connections_count();
 
-var data = "";
+var data = "0";
 
 do {
     data = qnet_server_queue_poll();
@@ -87,30 +151,39 @@ do {
     var value = parsed[1];
     
     show_debug_message("KEY: '" + key + "', VALUE: '" + value + "'");
+    
+    switch(key)
+    {
+        case "new_connection":
+            // tell the client to create the other players
+            var arr = array_create(2);
+            arr[0] = o_player;
+            for(var i = 0; i &lt; instance_number(o_player); i++)
+            {
+                arr[1] = instance_find(o_player, i);
+                qnet_server_queue_reliable_put_array_int("instance_create", arr);
+            }
+        
+            // create a player for that client
+            var player = qnet_server_instance_create(room_width / 2, room_height / 2, o_player);
+            player.player_id = real(value) + 1;
+            break;
+        case "disconnected":
+            var player_id = real(value) + 1;
+            for(var i = 0; i &lt; instance_number(o_player); i++)
+            {
+                var player = instance_find(o_player, i);
+                if(player.player_id == player_id)
+                {
+                    qnet_server_queue_reliable_put_int("instance_destroy", player);
+                    instance_destroy(player);
+                    break;
+                }
+            }
+            break;
+    }
 }
-until(data != "");
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///Send data
-qnet_server_queue_reliable_put_int("online_count", connections_count + 1);
+until(data == "0" || data == "-1");
 </string>
           </argument>
         </arguments>
