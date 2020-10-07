@@ -58,7 +58,10 @@ namespace QuickNet
             else
                 return;
 
-            writer.Put(t.key); //TODO: optimize the size needed to transmit the key
+            //TODO: optimize the size needed to transmit the key
+            var key = SubASCIIStringEncoder.GetBytes(t.key);
+            writer.Put((byte)(key.Length - 1));
+            writer.Put(key);
         }
 
         public static (string key, string data)? DeserializeData(NetDataReader reader)
@@ -96,7 +99,10 @@ namespace QuickNet
                     return null;
             }
 
-            var key = reader.GetString(); //TODO: optimize the size needed to transmit the key
+            //TODO: optimize the size needed to transmit the key
+            var keyAsBytes = new byte[reader.GetByte() + 1];
+            reader.GetBytes(keyAsBytes, keyAsBytes.Length);
+            var key = SubASCIIStringEncoder.GetString(keyAsBytes);
 
             return (key, data);
         }
