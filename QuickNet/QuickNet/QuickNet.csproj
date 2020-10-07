@@ -69,6 +69,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serializer.cs" />
     <Compile Include="Server.cs" />
+    <Compile Include="SubASCIIStringEncoder.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
