@@ -256,5 +256,21 @@ namespace QuickNet
                 return -1;
             }
         }
+
+        [DllExport("client_queue_reliable_put_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientQueueReliablePutBool(string key, double value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, ((int)value) == 1);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_queue_reliable_put_bool' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
     }
 }

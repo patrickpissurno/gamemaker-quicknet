@@ -232,6 +232,18 @@
           <argCount>0</argCount>
           <args/>
         </function>
+        <function>
+          <name>qnet_client_queue_reliable_put_bool</name>
+          <externalName>client_queue_reliable_put_bool</externalName>
+          <kind>12</kind>
+          <help>qnet_client_queue_reliable_put_bool(key, bool)</help>
+          <returnType>2</returnType>
+          <argCount>2</argCount>
+          <args>
+            <arg>1</arg>
+            <arg>2</arg>
+          </args>
+        </function>
       </functions>
       <constants/>
     </file>

@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -21,11 +22,13 @@ namespace QuickNet
         private EventBasedNetListener listener;
         private NetManager client;
         private Thread mainThread;
+        private NetPeer host;
         private bool started = false;
         private bool stop = false;
         private int id = -1;
 
         private ConcurrentQueue<(string key, string data)> inboundQueue;
+        private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
 
         public void Connect(string ip, string port)
         {
@@ -35,11 +38,12 @@ namespace QuickNet
             id = -1;
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
+            reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
 
             listener = new EventBasedNetListener();
             client = new NetManager(listener);
             client.Start();
-            client.Connect(ip, int.Parse(port), "");
+            host = client.Connect(ip, int.Parse(port), "");
 
             started = true;
 
@@ -86,6 +90,11 @@ namespace QuickNet
             return id;
         }
 
+        public void ReliablePut(string key, object value)
+        {
+            reliableOutboundQueue.Enqueue((key, value));
+        }
+
         private void NetworkReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
             try
@@ -119,6 +128,19 @@ namespace QuickNet
             while (!stop)
             {
                 client.PollEvents();
+
+                bool empty = true;
+
+                var writer = new NetDataWriter();
+                while (reliableOutboundQueue.TryDequeue(out var t))
+                {
+                    Serializer.SerializeData(writer, t);
+                    empty = false;
+                }
+
+                if(!empty)
+                    host.Send(writer, DeliveryMethod.ReliableOrdered);
+
                 Thread.Sleep(15);
             }
 

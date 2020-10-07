@@ -16,6 +16,7 @@
     <scripts name="utils">
       <script>scripts\get_text_cursor.gml</script>
       <script>scripts\qnet_server_instance_create.gml</script>
+      <script>scripts\process_client_keyboard.gml</script>
     </scripts>
     <script>scripts\qnet_parse_data.gml</script>
     <script>scripts\qnet_encode_array.gml</script>

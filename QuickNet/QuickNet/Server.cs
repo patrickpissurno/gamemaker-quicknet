@@ -68,8 +68,33 @@ namespace QuickNet
                 inboundQueue.Enqueue(("disconnected", (peer.Id + 1).ToString()));
             };
 
+            listener.NetworkReceiveEvent += NetworkReceived;
+
             mainThread = new Thread(MainThread) { IsBackground = true };
             mainThread.Start();
+        }
+
+        private void NetworkReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
+        {
+            try
+            {
+                while (!reader.EndOfData)
+                {
+
+                    var data = Serializer.DeserializeData(reader);
+                    if (data != null)
+                        inboundQueue.Enqueue(((string key, string data))data);
+                }
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("[NetworkReceived] thrown an exception. Stack:");
+                Utils.Log(ex);
+            }
+            finally
+            {
+                reader.Recycle();
+            }
         }
 
         public void Stop()
@@ -125,13 +150,17 @@ namespace QuickNet
                 }
                 else
                 {
+                    bool empty = true;
+
                     var writer = new NetDataWriter();
                     while (reliableOutboundQueue.TryDequeue(out var t))
                     {
                         Serializer.SerializeData(writer, t);
+                        empty = false;
                     }
 
-                    server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                    if(!empty)
+                        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
                 }
 
                 Thread.Sleep(15);

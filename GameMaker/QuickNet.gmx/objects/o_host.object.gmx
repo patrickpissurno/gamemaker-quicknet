@@ -26,16 +26,25 @@
           <argument>
             <kind>1</kind>
             <string>global.is_host = true;
-qnet_server_start(global.ip, global.port, 10);
+
+var max_players = 10;
+
 connections_count = 0;
 
 global.ds_map_x = ds_map_create();
 global.ds_map_y = ds_map_create();
 
+global.keyboard_left = array_create(max_players);
+global.keyboard_right = array_create(max_players);
+global.keyboard_up = array_create(max_players);
+global.keyboard_down = array_create(max_players);
+
 var player = instance_create(room_width / 2, room_height / 2, o_player);
 player.player_id = 0;
 
 alarm[11] = 10;
+
+qnet_server_start(global.ip, global.port, max_players);
 </string>
           </argument>
         </arguments>
@@ -180,6 +189,13 @@ do {
                     break;
                 }
             }
+            break;
+        default:
+            if(process_client_keyboard(key, "keyboard_left", value)){}
+            else if(process_client_keyboard(key, "keyboard_right", value)){}
+            else if(process_client_keyboard(key, "keyboard_up", value)){}
+            else if(process_client_keyboard(key, "keyboard_down", value)){}
+
             break;
     }
 }
