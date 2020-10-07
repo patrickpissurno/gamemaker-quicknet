@@ -41,7 +41,7 @@
 
             byte c, d;
             int t;
-            for (int i = 0, b = 0; i < data_len && b < size; i++, b++)
+            for (int i = 0, b = 0; b < size; i++, b++)
             {
                 c = asciiToIdentifier[data[i]];
                 d = i + 1 >= data_len ? garbage : asciiToIdentifier[data[i + 1]];
