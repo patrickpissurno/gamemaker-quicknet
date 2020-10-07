@@ -67,9 +67,7 @@
         {
             //bitmasks (for 'and')
             const byte t0_right = 0x3;  //00000011
-            const byte t1_left = 0xF0;  //11110000
             const byte t1_right = 0xF;  //00001111
-            const byte t2_left = 0xC0;  //11000000
             const byte t2_right = 0x3F; //00111111
             //bitmask (for 'or')
             const byte garbage = 0xC0;  //11000000
@@ -101,7 +99,7 @@
                             )
                             +
                             (
-                                (buffer[b + 1] & t1_left) >> 4 //'& t1_left' can be safely removed
+                                buffer[b + 1] >> 4
                             )
                         );
                         result += identifierToAscii[d];
@@ -118,7 +116,7 @@
                             )
                             +
                             (
-                                (buffer[b + 1] & t2_left) >> 6 //'& t2_left' can be safely removed
+                                buffer[b + 1] >> 6
                             )
                         );
                         result += identifierToAscii[d];
