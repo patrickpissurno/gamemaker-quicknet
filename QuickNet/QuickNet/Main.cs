@@ -208,6 +208,146 @@ namespace QuickNet
         #endregion
 
         #endregion
+        
+        #region Send Reliable To
+
+        #region Primitive Types
+
+        [DllExport("server_send_reliable_to", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableTo(double destination_id, string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, value);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_send_reliable_to_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableToFloat(double destination_id, string key, double value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, value);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_send_reliable_to_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableToInt(double destination_id, string key, double value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, (int)value);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+        
+        [DllExport("server_send_reliable_to_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableToBool(double destination_id, string key, double value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, ((int)value) == 1);
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to_bool' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        #endregion
+
+        #region Array Types
+
+        [DllExport("server_send_reliable_to_array", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableToArray(double destination_id, string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, Utils.DecodeArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to_array' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_send_reliable_to_array_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableToArrayFloat(double destination_id, string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, Utils.DecodeDoubleArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to_array_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+        
+        [DllExport("server_send_reliable_to_array_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableArrayInt(double destination_id, string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, Utils.DecodeIntArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to_array_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("server_send_reliable_to_array_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableToArrayBool(double destination_id, string key, string value)
+        {
+            try
+            {
+                Server.GetInstance().ReliablePutTo((int)destination_id, key, Utils.DecodeBoolArray(value));
+                return 0;
+            }
+            catch(Exception ex)
+            {
+                Utils.Log("Function 'server_send_reliable_to_array_bool' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        #endregion
+
+        #endregion
 
         #endregion
 

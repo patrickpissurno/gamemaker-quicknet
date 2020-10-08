@@ -170,7 +170,7 @@ do {
             for(var i = 0; i &lt; instance_number(o_player); i++)
             {
                 arr[1] = instance_find(o_player, i);
-                qnet_server_sendr_array_int("!instance_create", arr);
+                qnet_server_sendr_to_array_int(real(value), "!instance_create", arr);
             }
         
             // create a player for that client

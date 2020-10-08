@@ -32,6 +32,8 @@ namespace QuickNet
 
         private Dictionary<string, object> outboundCache;
 
+        private static readonly object clientPeerCreationLock = new object();
+
         public void Start(string ip, string port, int maxConnections)
         {
             if (started)
@@ -60,13 +62,18 @@ namespace QuickNet
 
             listener.PeerConnectedEvent += peer =>
             {
+                ClientPeer client;
+                lock (clientPeerCreationLock)
+                {
+                    if (peer.Tag == null)
+                        peer.Tag = new ClientPeer();
+                    client = (ClientPeer)peer.Tag;
+                }
+
+                outboundCache = new Dictionary<string, object>(); //reset global cache
+
                 inboundQueue.Enqueue(("new_connection", (peer.Id + 1).ToString()));
-
-                outboundCache = new Dictionary<string, object>(); //reset cache
-
-                var writer = new NetDataWriter();
-                Serializer.SerializeData(writer, ("connected_id", peer.Id + 1));
-                peer.Send(writer, DeliveryMethod.ReliableOrdered);
+                client.reliableOutboundQueue.Enqueue(("connected_id", peer.Id + 1));
             };
 
             listener.PeerDisconnectedEvent += (peer, e) =>
@@ -147,6 +154,50 @@ namespace QuickNet
                 reliableOutboundQueue.Enqueue((key, value));
             }
         }
+        
+        public void ReliablePutTo(int id, string key, object value)
+        {
+            var peer = server.GetPeerById(id - 1);
+            if (peer == null)
+                return;
+
+            var bypassCache = key[0] == '!';
+
+            ClientPeer client;
+            if (peer.Tag is ClientPeer _client)
+            {
+                client = _client;
+
+                if (!bypassCache)
+                {
+                    bool globalContains;
+                    var localContains = false;
+
+                    if ((globalContains = outboundCache.ContainsKey(key)) || (localContains = client.outboundCache.ContainsKey(key)))
+                    {
+                        if (globalContains && Utils.CacheEntryEquals(outboundCache[key], value))
+                            return;
+
+                        if (localContains && Utils.CacheEntryEquals(client.outboundCache[key], value))
+                            return;
+                    }
+                }
+            }
+            else
+            {
+                lock (clientPeerCreationLock)
+                {
+                    if (peer.Tag == null)
+                        peer.Tag = new ClientPeer();
+                    client = (ClientPeer)peer.Tag;
+                }
+            }
+
+            if(!bypassCache)
+                client.outboundCache[key] = value;
+
+            client.reliableOutboundQueue.Enqueue((key, value));
+        }
 
         private void MainThread()
         {
@@ -162,15 +213,52 @@ namespace QuickNet
                 {
                     bool empty = true;
 
-                    var writer = new NetDataWriter();
+                    var writer = new NetDataWriter(true);
                     while (reliableOutboundQueue.TryDequeue(out var t))
                     {
                         Serializer.SerializeData(writer, t);
                         empty = false;
                     }
 
-                    if(!empty)
-                        server.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+                    var peers = server.ConnectedPeerList;
+
+                    var data = empty || (peers.Count < 2) ? null : writer.CopyData();
+                    var initialCapacity = data?.Length;
+                    var first = true;
+
+                    foreach (var peer in peers)
+                    {
+                        var client = (ClientPeer)peer.Tag;
+
+                        if (!first)
+                        {
+                            if (empty)
+                            {
+                                writer.Reset();
+                            }
+                            else
+                            {
+                                writer.Reset((int)initialCapacity);
+                                writer.Put(data);
+                            }
+                        }
+
+                        var _empty = empty;
+
+                        if (client != null)
+                        {
+                            while (client.reliableOutboundQueue.TryDequeue(out var t))
+                            {
+                                Serializer.SerializeData(writer, t);
+                                _empty = false;
+                            }
+                        }
+
+                        if(!_empty)
+                            peer.Send(writer, DeliveryMethod.ReliableOrdered);
+
+                        first = false;
+                    }
                 }
 
                 Thread.Sleep(15);

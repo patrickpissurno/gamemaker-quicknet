@@ -45,6 +45,10 @@
     <Resource>Scripts\qnet_client_sendr_array_float</Resource>
     <Resource>Scripts\qnet_client_sendr_array_int</Resource>
     <Resource>Scripts\qnet_client_sendr_array_bool</Resource>
+    <Resource>Scripts\qnet_server_sendr_to_array</Resource>
+    <Resource>Scripts\qnet_server_sendr_to_array_float</Resource>
+    <Resource>Scripts\qnet_server_sendr_to_array_int</Resource>
+    <Resource>Scripts\qnet_server_sendr_to_array_bool</Resource>
   </IncludedResources>
   <files>
     <file>
@@ -240,7 +244,7 @@
           <name>qnet_client_sendr_bool</name>
           <externalName>client_send_reliable_bool</externalName>
           <kind>12</kind>
-          <help>qnet_client_sendr_bool(key, bool)</help>
+          <help>qnet_client_sendr_bool(key, boolean)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -328,6 +332,110 @@
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>qnet_server_sendr_to</name>
+          <externalName>server_send_reliable_to</externalName>
+          <kind>12</kind>
+          <help>qnet_server_sendr_to(destination_client_id, key, string)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>qnet_server_sendr_to_int</name>
+          <externalName>server_send_reliable_to</externalName>
+          <kind>12</kind>
+          <help>qnet_server_sendr_to_int(destination_client_id, key, int)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>1</arg>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
+          <name>qnet_server_sendr_to_float</name>
+          <externalName>server_send_reliable_to_float</externalName>
+          <kind>12</kind>
+          <help>qnet_server_sendr_to_float(destination_client_id, key, float)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>1</arg>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
+          <name>qnet_server_sendr_to_bool</name>
+          <externalName>server_send_reliable_to_bool</externalName>
+          <kind>12</kind>
+          <help>qnet_server_sendr_to_bool(destination_client_id, key, boolean)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>1</arg>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_sendr_to_array</name>
+          <externalName>server_send_reliable_to_array</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_sendr_to_array(destination_client_id, key, encoded_array)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_sendr_to_array_float</name>
+          <externalName>server_send_reliable_to_array_float</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_sendr_to_array_float(destination_client_id, key, encoded_array)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_sendr_to_array_int</name>
+          <externalName>server_send_reliable_to_array_int</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_sendr_to_array_int(destination_client_id, key, encoded_array)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>1</arg>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_sendr_to_array_bool</name>
+          <externalName>server_send_reliable_to_array_bool</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_sendr_to_array_bool(destination_client_id, key, encoded_array)</help>
+          <returnType>2</returnType>
+          <argCount>3</argCount>
+          <args>
+            <arg>2</arg>
             <arg>1</arg>
             <arg>1</arg>
           </args>
