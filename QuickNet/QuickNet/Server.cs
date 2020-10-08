@@ -218,7 +218,7 @@ namespace QuickNet
                 }
                 else
                 {
-                    bool empty = true;
+                    var empty = true;
                     var writer = new NetDataWriter(true);
 
                     // unreliable
