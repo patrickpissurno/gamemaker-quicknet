@@ -696,6 +696,147 @@ namespace QuickNet
         #endregion
 
         #endregion
+        
+        #region Send Unreliable
+
+        #region Primitive Types
+
+        [DllExport("client_send_unreliable", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliable(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, value);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_unreliable_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliableFloat(string key, double value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, value);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_unreliable_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliableInt(string key, double value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, (int)value);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_unreliable_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliableBool(string key, double value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, ((int)value) == 1);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable_bool' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        #endregion
+
+        #region Array Types
+
+
+        [DllExport("client_send_unreliable_array", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliableArray(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, Utils.DecodeArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable_array' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_unreliable_array_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliableArrayFloat(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, Utils.DecodeDoubleArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable_array_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_unreliable_array_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliableArrayInt(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, Utils.DecodeIntArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable_array_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_unreliable_array_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendUnreliableArrayBool(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().UnreliablePut(key, Utils.DecodeBoolArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_unreliable_array_bool' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        #endregion
+
+        #endregion
 
         #endregion
     }

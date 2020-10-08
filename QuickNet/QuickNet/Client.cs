@@ -30,6 +30,7 @@ namespace QuickNet
 
         private ConcurrentQueue<(string key, string data)> inboundQueue;
         private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
+        private AppendOnlyDictionary<(string key, object data)> unreliableOutboundQueue;
 
         private Dictionary<string, object> outboundCache;
 
@@ -42,6 +43,7 @@ namespace QuickNet
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
             reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
+            unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
             outboundCache = new Dictionary<string, object>();
 
             listener = new EventBasedNetListener();
@@ -103,6 +105,11 @@ namespace QuickNet
             }
         }
 
+        public void UnreliablePut(string key, object value)
+        {
+            unreliableOutboundQueue[key] = (key, value);
+        }
+
         private void NetworkReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)
         {
             try
@@ -137,9 +144,32 @@ namespace QuickNet
             {
                 client.PollEvents();
 
-                bool empty = true;
+                var empty = true;
+                var writer = new NetDataWriter(true);
 
-                var writer = new NetDataWriter();
+                // unreliable
+                if (unreliableOutboundQueue.Count > 0)
+                {
+                    var unreliableQueue = unreliableOutboundQueue;
+                    unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
+
+                    var i = 0;
+                    while (i < unreliableQueue.Count)
+                    {
+                        Serializer.SerializeData(writer, unreliableQueue.Values[i]);
+                        empty = false;
+                        i++;
+                    }
+
+                    if (!empty)
+                        host.Send(writer, DeliveryMethod.Sequenced);
+                }
+
+                // reliable
+                if (!empty)
+                    writer.Reset();
+                empty = true;
+
                 while (reliableOutboundQueue.TryDequeue(out var t))
                 {
                     Serializer.SerializeData(writer, t);
