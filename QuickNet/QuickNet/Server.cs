@@ -141,7 +141,7 @@ namespace QuickNet
 
         public void ReliablePut(string key, object value)
         {
-            if (!outboundCache.ContainsKey(key) || !Utils.CacheEntryEquals(outboundCache[key], value))
+            if (key[0] == '!' || !outboundCache.ContainsKey(key) || !Utils.CacheEntryEquals(outboundCache[key], value))
             {
                 outboundCache[key] = value;
                 reliableOutboundQueue.Enqueue((key, value));
