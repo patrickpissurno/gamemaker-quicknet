@@ -2,6 +2,7 @@
 using LiteNetLib.Utils;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace QuickNet
@@ -30,6 +31,8 @@ namespace QuickNet
         private ConcurrentQueue<(string key, string data)> inboundQueue;
         private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
 
+        private Dictionary<string, object> outboundCache;
+
         public void Connect(string ip, string port)
         {
             if (started)
@@ -39,6 +42,7 @@ namespace QuickNet
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
             reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
+            outboundCache = new Dictionary<string, object>();
 
             listener = new EventBasedNetListener();
             client = new NetManager(listener);
@@ -92,7 +96,11 @@ namespace QuickNet
 
         public void ReliablePut(string key, object value)
         {
-            reliableOutboundQueue.Enqueue((key, value));
+            if (!outboundCache.ContainsKey(key) || !Utils.CacheEntryEquals(outboundCache[key], value))
+            {
+                outboundCache[key] = value;
+                reliableOutboundQueue.Enqueue((key, value));
+            }
         }
 
         private void NetworkReceived(NetPeer peer, NetPacketReader reader, DeliveryMethod deliveryMethod)

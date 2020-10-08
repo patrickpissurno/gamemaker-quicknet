@@ -204,5 +204,75 @@ namespace QuickNet
             var bytes = Convert.FromBase64String(data);
             return Encoding.UTF8.GetString(bytes);
         }
+
+        public static bool CacheEntryEquals(object valueA, object valueB) //I'll consider that both A and B have the same types, as types can't change in our implementation
+        {
+            if (valueA is bool)
+                return ((bool)valueA) == ((bool)valueB);
+            if (valueA is string)
+                return ((string)valueA) == ((string)valueB);
+            if (valueA is double)
+                return ((double)valueA) == ((double)valueB);
+            if (valueA is int)
+                return ((int)valueA) == ((int)valueB);
+
+            if (valueA is double[])
+                return ArrayEquals((double[])valueA, (double[])valueB);
+            if (valueA is bool[])
+                return ArrayEquals((bool[])valueA, (bool[])valueB);
+            if (valueA is string[])
+                return ArrayEquals((string[])valueA, (string[])valueB);
+            if (valueA is int[])
+                return ArrayEquals((int[])valueA, (int[])valueB);
+
+            return false;
+        }
+
+        private static bool ArrayEquals(string[] a, string[] b)
+        {
+            if (a.Length != b.Length)
+                return false;
+            for (var i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                    return false;
+            }
+            return true;
+        }
+
+        private static bool ArrayEquals(int[] a, int[] b)
+        {
+            if (a.Length != b.Length)
+                return false;
+            for (var i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                    return false;
+            }
+            return true;
+        }
+
+        private static bool ArrayEquals(double[] a, double[] b)
+        {
+            if (a.Length != b.Length)
+                return false;
+            for (var i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                    return false;
+            }
+            return true;
+        }
+        private static bool ArrayEquals(bool[] a, bool[] b)
+        {
+            if (a.Length != b.Length)
+                return false;
+            for (var i = 0; i < a.Length; i++)
+            {
+                if (a[i] != b[i])
+                    return false;
+            }
+            return true;
+        }
     }
 }
