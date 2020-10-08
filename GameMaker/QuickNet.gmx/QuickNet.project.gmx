@@ -26,10 +26,10 @@
     <script>scripts\qnet_decode_array_number.gml</script>
     <script>scripts\qnet_key_is_array.gml</script>
     <script>scripts\qnet_key_is_map.gml</script>
-    <script>scripts\qnet_server_send_reliable_array.gml</script>
-    <script>scripts\qnet_server_send_reliable_array_float.gml</script>
-    <script>scripts\qnet_server_send_reliable_array_int.gml</script>
-    <script>scripts\qnet_server_send_reliable_array_bool.gml</script>
+    <script>scripts\qnet_server_sendr_array.gml</script>
+    <script>scripts\qnet_server_sendr_array_float.gml</script>
+    <script>scripts\qnet_server_sendr_array_int.gml</script>
+    <script>scripts\qnet_server_sendr_array_bool.gml</script>
   </scripts>
   <fonts name="fonts">
     <font>fonts\f_arial_18</font>

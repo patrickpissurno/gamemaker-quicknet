@@ -118,10 +118,10 @@ if(!global.is_host &amp;&amp; global.player_id &gt; 0)
     var up = keyboard_check(vk_up)
     var down = keyboard_check(vk_down);
 
-    qnet_client_send_reliable_bool("keyboard_left[" + string(global.player_id) + "]", left);
-    qnet_client_send_reliable_bool("keyboard_right[" + string(global.player_id) + "]", right);
-    qnet_client_send_reliable_bool("keyboard_up[" + string(global.player_id) + "]", up);
-    qnet_client_send_reliable_bool("keyboard_down[" + string(global.player_id) + "]", down);
+    qnet_client_sendr_bool("keyboard_left[" + string(global.player_id) + "]", left);
+    qnet_client_sendr_bool("keyboard_right[" + string(global.player_id) + "]", right);
+    qnet_client_sendr_bool("keyboard_up[" + string(global.player_id) + "]", up);
+    qnet_client_sendr_bool("keyboard_down[" + string(global.player_id) + "]", down);
 }
 </string>
           </argument>
