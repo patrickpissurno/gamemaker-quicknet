@@ -64,9 +64,14 @@ port = "";
             if(port == "")
                 port = "25565";
                 
-            global.ip = "0.0.0.0";
-            global.port = port;
-            room_goto(r_host);
+            if(qnet_utils_check_valid_port_number(port))
+            {
+                global.ip = "0.0.0.0";
+                global.port = port;
+                room_goto(r_host);
+            }
+            else
+                port = "";
         }
         else if(keyboard_check_released(vk_escape)){
             mode = "";
@@ -82,7 +87,11 @@ port = "";
         if(keyboard_check_released(vk_enter)){
             if(ip == "")
                 ip = "127.0.0.1";
-            mode = "client_port";
+                
+            if(qnet_utils_check_valid_ip_address(ip))
+                mode = "client_port";
+            else
+                ip = "";
         }
         else if(keyboard_check_released(vk_escape)){
             mode = "";
@@ -98,10 +107,14 @@ port = "";
         if(keyboard_check_released(vk_enter)){
             if(port == "")
                 port = "25565";
-                
-            global.ip = ip;
-            global.port = port;
-            room_goto(r_client);
+            
+            if(qnet_utils_check_valid_port_number(port)){
+                global.ip = ip;
+                global.port = port;
+                room_goto(r_client);
+            }
+            else
+                port = "";
         }
         else if(keyboard_check_released(vk_escape))
             mode = "client";

@@ -271,7 +271,14 @@ draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 draw_set_font(f_arial_18);
 
-draw_text(20, 20, "Client (" + global.ip + ":" + global.port + ")#Online: " + string(online_count) + "#Player ID: " + string(global.player_id));
+if(global.player_id &lt; 1)
+{
+    draw_text(20, 20, "Client (" + global.ip + ":" + global.port + ")#Attempting to connect...");
+}
+else
+{
+    draw_text(20, 20, "Client (" + global.ip + ":" + global.port + ")#Online: " + string(online_count) + "#Player ID: " + string(global.player_id));
+}
 </string>
           </argument>
         </arguments>

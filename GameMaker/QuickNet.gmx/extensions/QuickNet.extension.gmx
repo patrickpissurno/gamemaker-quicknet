@@ -640,6 +640,28 @@
             <arg>1</arg>
           </args>
         </function>
+        <function>
+          <name>qnet_utils_check_valid_ip_address</name>
+          <externalName>utils_check_valid_ip_address</externalName>
+          <kind>12</kind>
+          <help>qnet_utils_check_valid_ip_address(ip_address)</help>
+          <returnType>2</returnType>
+          <argCount>1</argCount>
+          <args>
+            <arg>1</arg>
+          </args>
+        </function>
+        <function>
+          <name>qnet_utils_check_valid_port_number</name>
+          <externalName>utils_check_valid_port_number</externalName>
+          <kind>12</kind>
+          <help>qnet_utils_check_valid_port_number(port)</help>
+          <returnType>2</returnType>
+          <argCount>1</argCount>
+          <args>
+            <arg>1</arg>
+          </args>
+        </function>
       </functions>
       <constants/>
     </file>

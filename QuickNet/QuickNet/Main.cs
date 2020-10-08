@@ -839,5 +839,19 @@ namespace QuickNet
         #endregion
 
         #endregion
+
+        #region Utils functions
+        [DllExport("utils_check_valid_ip_address", CallingConvention = CallingConvention.Cdecl)]
+        public static double UtilsCheckValidIpAddress(string ip)
+        {
+            return Utils.IsIpAddressValid(ip) ? 1 : 0;
+        }
+
+        [DllExport("utils_check_valid_port_number", CallingConvention = CallingConvention.Cdecl)]
+        public static double UtilsCheckValidPortNumber(string port)
+        {
+            return Utils.IsPortNumberValid(port) ? 1 : 0;
+        }
+        #endregion
     }
 }

@@ -263,6 +263,7 @@ namespace QuickNet
             }
             return true;
         }
+
         private static bool ArrayEquals(bool[] a, bool[] b)
         {
             if (a.Length != b.Length)
@@ -273,6 +274,27 @@ namespace QuickNet
                     return false;
             }
             return true;
+        }
+
+        public static bool IsIpAddressValid(string ip)
+        {
+            // Split string by ".", check that array length is 4
+            var arr = ip.Split('.');
+            if (arr.Length != 4)
+                return false;
+
+            //Check each substring checking that parses to byte
+            byte b = 0;
+            foreach (var oct in arr)
+                if (!byte.TryParse(oct, out b))
+                    return false;
+
+            return true;
+        }
+
+        public static bool IsPortNumberValid(string port)
+        {
+            return int.TryParse(port, out var p) && p >= 0 && p <= 65535;
         }
     }
 }
