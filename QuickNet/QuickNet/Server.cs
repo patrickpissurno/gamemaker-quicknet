@@ -29,6 +29,7 @@ namespace QuickNet
 
         private ConcurrentQueue<(string key, string data)> inboundQueue;
         private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
+        private Dictionary<string, object> unreliableOutboundQueue;
 
         private Dictionary<string, object> outboundCache;
 
@@ -41,6 +42,7 @@ namespace QuickNet
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
             reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
+            unreliableOutboundQueue = new Dictionary<string, object>();
             outboundCache = new Dictionary<string, object>();
 
             listener = new EventBasedNetListener();
@@ -199,6 +201,11 @@ namespace QuickNet
             client.reliableOutboundQueue.Enqueue((key, value));
         }
 
+        public void UnreliablePut(string key, object value)
+        {
+            unreliableOutboundQueue[key] = value;
+        }
+
         private void MainThread()
         {
             while (!stop)
@@ -212,8 +219,26 @@ namespace QuickNet
                 else
                 {
                     bool empty = true;
-
                     var writer = new NetDataWriter(true);
+
+                    // unreliable
+                    var unreliableQueue = unreliableOutboundQueue;
+                    unreliableOutboundQueue = new Dictionary<string, object>();
+
+                    foreach(var item in unreliableQueue)
+                    {
+                        Serializer.SerializeData(writer, (item.Key, item.Value));
+                        empty = false;
+                    }
+
+                    if (!empty)
+                        server.SendToAll(writer, DeliveryMethod.Sequenced);
+
+                    // reliable
+                    if(!empty)
+                        writer.Reset();
+                    empty = true;
+                    
                     while (reliableOutboundQueue.TryDequeue(out var t))
                     {
                         Serializer.SerializeData(writer, t);

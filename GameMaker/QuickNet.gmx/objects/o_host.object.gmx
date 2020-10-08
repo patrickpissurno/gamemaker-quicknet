@@ -119,10 +119,10 @@ alarm[11] = 2;
 qnet_server_sendr_int("online_count", connections_count + 1);
 
 for(var key = ds_map_find_first(global.ds_map_x); !is_undefined(key); key = ds_map_find_next(global.ds_map_x, key))
-    qnet_server_sendr_float("ds_map_x{" + key + "}", global.ds_map_x[? key]);
+    qnet_server_sendu_float("ds_map_x{" + key + "}", global.ds_map_x[? key]);
 
 for(var key = ds_map_find_first(global.ds_map_y); !is_undefined(key); key = ds_map_find_next(global.ds_map_y, key))
-    qnet_server_sendr_float("ds_map_y{" + key + "}", global.ds_map_y[? key]);
+    qnet_server_sendu_float("ds_map_y{" + key + "}", global.ds_map_y[? key]);
 </string>
           </argument>
         </arguments>
