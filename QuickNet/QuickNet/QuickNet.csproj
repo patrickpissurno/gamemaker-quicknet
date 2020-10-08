@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppendOnlyDictionary.cs" />
     <Compile Include="Client.cs" />
     <Compile Include="ClientPeer.cs" />
     <Compile Include="Main.cs" />

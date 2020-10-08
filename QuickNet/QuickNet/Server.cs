@@ -29,7 +29,7 @@ namespace QuickNet
 
         private ConcurrentQueue<(string key, string data)> inboundQueue;
         private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
-        private Dictionary<string, object> unreliableOutboundQueue;
+        private AppendOnlyDictionary<(string key, object data)> unreliableOutboundQueue;
 
         private Dictionary<string, object> outboundCache;
 
@@ -42,7 +42,7 @@ namespace QuickNet
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
             reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
-            unreliableOutboundQueue = new Dictionary<string, object>();
+            unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
             outboundCache = new Dictionary<string, object>();
 
             listener = new EventBasedNetListener();
@@ -203,7 +203,7 @@ namespace QuickNet
 
         public void UnreliablePut(string key, object value)
         {
-            unreliableOutboundQueue[key] = value;
+            unreliableOutboundQueue[key] = (key, value);
         }
 
         private void MainThread()
@@ -223,12 +223,14 @@ namespace QuickNet
 
                     // unreliable
                     var unreliableQueue = unreliableOutboundQueue;
-                    unreliableOutboundQueue = new Dictionary<string, object>();
+                    unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
 
-                    foreach(var item in unreliableQueue)
+                    var i = 0;
+                    while (i < unreliableQueue.Count)
                     {
-                        Serializer.SerializeData(writer, (item.Key, item.Value));
+                        Serializer.SerializeData(writer, unreliableQueue.Values[i]);
                         empty = false;
+                        i++;
                     }
 
                     if (!empty)
