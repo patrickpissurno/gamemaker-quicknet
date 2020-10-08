@@ -116,13 +116,13 @@ alarm[11] = 2;
           <argument>
             <kind>1</kind>
             <string>///Send data
-qnet_server_queue_reliable_put_int("online_count", connections_count + 1);
+qnet_server_send_reliable_int("online_count", connections_count + 1);
 
 for(var key = ds_map_find_first(global.ds_map_x); !is_undefined(key); key = ds_map_find_next(global.ds_map_x, key))
-    qnet_server_queue_reliable_put_float("ds_map_x{" + key + "}", global.ds_map_x[? key]);
+    qnet_server_send_reliable_float("ds_map_x{" + key + "}", global.ds_map_x[? key]);
 
 for(var key = ds_map_find_first(global.ds_map_y); !is_undefined(key); key = ds_map_find_next(global.ds_map_y, key))
-    qnet_server_queue_reliable_put_float("ds_map_y{" + key + "}", global.ds_map_y[? key]);
+    qnet_server_send_reliable_float("ds_map_y{" + key + "}", global.ds_map_y[? key]);
 </string>
           </argument>
         </arguments>
@@ -159,7 +159,7 @@ do {
     var key = parsed[0];
     var value = parsed[1];
     
-    show_debug_message("KEY: '" + key + "', VALUE: '" + value + "'");
+    debug_log("KEY: '" + key + "', VALUE: '" + value + "'");
     
     switch(key)
     {
@@ -170,7 +170,7 @@ do {
             for(var i = 0; i &lt; instance_number(o_player); i++)
             {
                 arr[1] = instance_find(o_player, i);
-                qnet_server_queue_reliable_put_array_int("instance_create", arr);
+                qnet_server_send_reliable_array_int("instance_create", arr);
             }
         
             // create a player for that client
@@ -184,7 +184,7 @@ do {
                 var player = instance_find(o_player, i);
                 if(player.player_id == player_id)
                 {
-                    qnet_server_queue_reliable_put_int("instance_destroy", player);
+                    qnet_server_send_reliable_int("instance_destroy", player);
                     instance_destroy(player);
                     break;
                 }

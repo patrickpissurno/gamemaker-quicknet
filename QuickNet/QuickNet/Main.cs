@@ -67,8 +67,8 @@ namespace QuickNet
             }
         }
 
-        [DllExport("server_queue_reliable_put", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePut(string key, string value)
+        [DllExport("server_send_reliable", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliable(string key, string value)
         {
             try
             {
@@ -77,14 +77,14 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
         }
 
-        [DllExport("server_queue_reliable_put_float", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePutFloat(string key, double value)
+        [DllExport("server_send_reliable_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableFloat(string key, double value)
         {
             try
             {
@@ -93,14 +93,14 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_float' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable_float' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
         }
 
-        [DllExport("server_queue_reliable_put_int", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePutInt(string key, double value)
+        [DllExport("server_send_reliable_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableInt(string key, double value)
         {
             try
             {
@@ -109,14 +109,14 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_int' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable_int' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
         }
         
-        [DllExport("server_queue_reliable_put_bool", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePutBool(string key, double value)
+        [DllExport("server_send_reliable_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableBool(string key, double value)
         {
             try
             {
@@ -125,14 +125,14 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_bool' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable_bool' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
         }
 
-        [DllExport("server_queue_reliable_put_array", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePutArray(string key, string value)
+        [DllExport("server_send_reliable_array", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableArray(string key, string value)
         {
             try
             {
@@ -141,14 +141,14 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_array' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable_array' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
         }
 
-        [DllExport("server_queue_reliable_put_array_float", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePutArrayFloat(string key, string value)
+        [DllExport("server_send_reliable_array_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableArrayFloat(string key, string value)
         {
             try
             {
@@ -157,14 +157,14 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_array_float' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable_array_float' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
         }
         
-        [DllExport("server_queue_reliable_put_array_int", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePutArrayInt(string key, string value)
+        [DllExport("server_send_reliable_array_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableArrayInt(string key, string value)
         {
             try
             {
@@ -173,14 +173,14 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_array_int' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable_array_int' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
         }
 
-        [DllExport("server_queue_reliable_put_array_bool", CallingConvention = CallingConvention.Cdecl)]
-        public static double ServerQueueReliablePutArrayBool(string key, string value)
+        [DllExport("server_send_reliable_array_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ServerSendReliableArrayBool(string key, string value)
         {
             try
             {
@@ -189,7 +189,7 @@ namespace QuickNet
             }
             catch(Exception ex)
             {
-                Utils.Log("Function 'server_queue_reliable_put_array_bool' has thrown an exception. Stack:");
+                Utils.Log("Function 'server_send_reliable_array_bool' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }
@@ -257,8 +257,8 @@ namespace QuickNet
             }
         }
 
-        [DllExport("client_queue_reliable_put_bool", CallingConvention = CallingConvention.Cdecl)]
-        public static double ClientQueueReliablePutBool(string key, double value)
+        [DllExport("client_send_reliable_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliableBool(string key, double value)
         {
             try
             {
@@ -267,7 +267,7 @@ namespace QuickNet
             }
             catch (Exception ex)
             {
-                Utils.Log("Function 'client_queue_reliable_put_bool' has thrown an exception. Stack:");
+                Utils.Log("Function 'client_send_reliable_bool' has thrown an exception. Stack:");
                 Utils.Log(ex);
                 return 1;
             }

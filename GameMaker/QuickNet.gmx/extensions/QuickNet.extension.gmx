@@ -35,12 +35,12 @@
     <Resource>Scripts\qnet_key_is_array</Resource>
     <Resource>Scripts\qnet_key_is_map</Resource>
     <Resource>Scripts\qnet_encode_array</Resource>
-    <Resource>Scripts\qnet_server_queue_reliable_put_array</Resource>
-    <Resource>Scripts\qnet_server_queue_reliable_put_array_float</Resource>
-    <Resource>Scripts\qnet_server_queue_reliable_put_array_int</Resource>
     <Resource>Scripts\qnet_encode_array_number</Resource>
     <Resource>Scripts\qnet_decode_array_number</Resource>
-    <Resource>Scripts\qnet_server_queue_reliable_put_array_bool</Resource>
+    <Resource>Scripts\qnet_server_send_reliable_array</Resource>
+    <Resource>Scripts\qnet_server_send_reliable_array_float</Resource>
+    <Resource>Scripts\qnet_server_send_reliable_array_int</Resource>
+    <Resource>Scripts\qnet_server_send_reliable_array_bool</Resource>
   </IncludedResources>
   <files>
     <file>
@@ -119,10 +119,10 @@
           <args/>
         </function>
         <function>
-          <name>qnet_server_queue_reliable_put</name>
-          <externalName>server_queue_reliable_put</externalName>
+          <name>qnet_server_send_reliable</name>
+          <externalName>server_send_reliable</externalName>
           <kind>12</kind>
-          <help>qnet_server_queue_reliable_put(key, value)</help>
+          <help>qnet_server_send_reliable(key, value)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -131,22 +131,10 @@
           </args>
         </function>
         <function>
-          <name>qnet_server_queue_reliable_put_int</name>
-          <externalName>server_queue_reliable_put_int</externalName>
+          <name>qnet_server_send_reliable_int</name>
+          <externalName>server_send_reliable_int</externalName>
           <kind>12</kind>
-          <help>qnet_server_queue_reliable_put_int(key, int)</help>
-          <returnType>2</returnType>
-          <argCount>2</argCount>
-          <args>
-            <arg>1</arg>
-            <arg>2</arg>
-          </args>
-        </function>
-        <function>
-          <name>qnet_server_queue_reliable_put_float</name>
-          <externalName>server_queue_reliable_put_float</externalName>
-          <kind>12</kind>
-          <help>qnet_server_queue_reliable_put_float(key, float)</help>
+          <help>qnet_server_send_reliable_int(key, int)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -155,10 +143,22 @@
           </args>
         </function>
         <function>
-          <name>_qnet_server_queue_reliable_put_array</name>
-          <externalName>server_queue_reliable_put_array</externalName>
+          <name>qnet_server_send_reliable_float</name>
+          <externalName>server_send_reliable_float</externalName>
           <kind>12</kind>
-          <help>_qnet_server_queue_reliable_put_array(key, encoded_array)</help>
+          <help>qnet_server_send_reliable_float(key, float)</help>
+          <returnType>2</returnType>
+          <argCount>2</argCount>
+          <args>
+            <arg>1</arg>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
+          <name>_qnet_server_send_reliable_array</name>
+          <externalName>server_send_reliable_array</externalName>
+          <kind>12</kind>
+          <help>_qnet_server_send_reliable_array(key, encoded_array)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -167,10 +167,10 @@
           </args>
         </function>
         <function>
-          <name>_qnet_server_queue_reliable_put_array_float</name>
-          <externalName>server_queue_reliable_put_array_float</externalName>
+          <name>_qnet_server_send_reliable_array_float</name>
+          <externalName>server_send_reliable_array_float</externalName>
           <kind>12</kind>
-          <help>_qnet_server_queue_reliable_put_array_float(encoded_array)</help>
+          <help>_qnet_server_send_reliable_array_float(key, encoded_array)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -179,10 +179,10 @@
           </args>
         </function>
         <function>
-          <name>_qnet_server_queue_reliable_put_array_int</name>
-          <externalName>server_queue_reliable_put_array_int</externalName>
+          <name>_qnet_server_send_reliable_array_int</name>
+          <externalName>server_send_reliable_array_int</externalName>
           <kind>12</kind>
-          <help>_qnet_server_queue_reliable_put_array_int(encoded_array)</help>
+          <help>_qnet_server_send_reliable_array_int(key, encoded_array)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -200,10 +200,10 @@
           <args/>
         </function>
         <function>
-          <name>qnet_server_queue_reliable_put_bool</name>
-          <externalName>server_queue_reliable_put_bool</externalName>
+          <name>qnet_server_send_reliable_bool</name>
+          <externalName>server_send_reliable_bool</externalName>
           <kind>12</kind>
-          <help>qnet_server_queue_reliable_put_bool(key, boolean)</help>
+          <help>qnet_server_send_reliable_bool(key, boolean)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -212,10 +212,10 @@
           </args>
         </function>
         <function>
-          <name>_qnet_server_queue_reliable_put_array_bool</name>
-          <externalName>server_queue_reliable_put_array_bool</externalName>
+          <name>_qnet_server_send_reliable_array_bool</name>
+          <externalName>server_send_reliable_array_bool</externalName>
           <kind>12</kind>
-          <help>_qnet_server_queue_reliable_put_array_bool(encoded_array)</help>
+          <help>_qnet_server_send_reliable_array_bool(key, encoded_array)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -233,10 +233,10 @@
           <args/>
         </function>
         <function>
-          <name>qnet_client_queue_reliable_put_bool</name>
-          <externalName>client_queue_reliable_put_bool</externalName>
+          <name>qnet_client_send_reliable_bool</name>
+          <externalName>client_send_reliable_bool</externalName>
           <kind>12</kind>
-          <help>qnet_client_queue_reliable_put_bool(key, bool)</help>
+          <help>qnet_client_send_reliable_bool(key, bool)</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
