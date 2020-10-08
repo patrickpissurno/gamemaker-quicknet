@@ -5,6 +5,8 @@ namespace QuickNet
 {
     public static class Main
     {
+        #region Server functions
+
         [DllExport("server_start", CallingConvention = CallingConvention.Cdecl)]
         public static double ServerStart(string ip, string port, double maxConnections)
         {
@@ -66,6 +68,10 @@ namespace QuickNet
                 return "-1";
             }
         }
+
+        #region Send Reliable
+
+        #region Primitive Types
 
         [DllExport("server_send_reliable", CallingConvention = CallingConvention.Cdecl)]
         public static double ServerSendReliable(string key, string value)
@@ -131,6 +137,10 @@ namespace QuickNet
             }
         }
 
+        #endregion
+
+        #region Array Types
+
         [DllExport("server_send_reliable_array", CallingConvention = CallingConvention.Cdecl)]
         public static double ServerSendReliableArray(string key, string value)
         {
@@ -195,6 +205,14 @@ namespace QuickNet
             }
         }
 
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Client functions
+
         [DllExport("client_connect", CallingConvention = CallingConvention.Cdecl)]
         public static double ClientConnect(string ip, string port)
         {
@@ -257,6 +275,58 @@ namespace QuickNet
             }
         }
 
+        #region Send Reliable
+
+        #region Primitive Types
+
+        [DllExport("client_send_reliable", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliable(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, value);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_reliable' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_reliable_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliableFloat(string key, double value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, value);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_reliable_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_reliable_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliableInt(string key, double value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, (int)value);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_reliable_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
         [DllExport("client_send_reliable_bool", CallingConvention = CallingConvention.Cdecl)]
         public static double ClientSendReliableBool(string key, double value)
         {
@@ -272,5 +342,80 @@ namespace QuickNet
                 return 1;
             }
         }
+
+        #endregion
+
+        #region Array Types
+
+
+        [DllExport("client_send_reliable_array", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliableArray(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, Utils.DecodeArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_reliable_array' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_reliable_array_float", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliableArrayFloat(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, Utils.DecodeDoubleArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_reliable_array_float' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_reliable_array_int", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliableArrayInt(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, Utils.DecodeIntArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_reliable_array_int' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        [DllExport("client_send_reliable_array_bool", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientSendReliableArrayBool(string key, string value)
+        {
+            try
+            {
+                Client.GetInstance().ReliablePut(key, Utils.DecodeBoolArray(value));
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_send_reliable_array_bool' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return 1;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
     }
 }
