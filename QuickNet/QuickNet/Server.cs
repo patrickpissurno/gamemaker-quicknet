@@ -222,19 +222,22 @@ namespace QuickNet
                     var writer = new NetDataWriter(true);
 
                     // unreliable
-                    var unreliableQueue = unreliableOutboundQueue;
-                    unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
-
-                    var i = 0;
-                    while (i < unreliableQueue.Count)
+                    if (unreliableOutboundQueue.Count > 0)
                     {
-                        Serializer.SerializeData(writer, unreliableQueue.Values[i]);
-                        empty = false;
-                        i++;
-                    }
+                        var unreliableQueue = unreliableOutboundQueue;
+                        unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
 
-                    if (!empty)
-                        server.SendToAll(writer, DeliveryMethod.Sequenced);
+                        var i = 0;
+                        while (i < unreliableQueue.Count)
+                        {
+                            Serializer.SerializeData(writer, unreliableQueue.Values[i]);
+                            empty = false;
+                            i++;
+                        }
+
+                        if (!empty)
+                            server.SendToAll(writer, DeliveryMethod.Sequenced);
+                    }
 
                     // reliable
                     if(!empty)
