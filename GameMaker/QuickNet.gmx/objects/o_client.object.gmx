@@ -166,7 +166,7 @@ do {
         case "online_count":
             online_count = real(value);
             break;
-        case "instance_create":
+        case "!instance_create":
             var instance_data = qnet_decode_array_number(value);
             var old_instance_id = global.ds_map_instances_htc[? string(instance_data[1])];
             if(is_undefined(old_instance_id))
@@ -176,7 +176,7 @@ do {
                 global.ds_map_instances_htc[? string(instance_data[1])] = new_instance_id;
             }
             break;
-        case "instance_destroy":
+        case "!instance_destroy":
             var old_instance_id = global.ds_map_instances_htc[? value];
             if(!is_undefined(old_instance_id))
             {

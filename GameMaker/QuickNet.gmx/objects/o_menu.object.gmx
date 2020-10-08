@@ -52,9 +52,9 @@ port = "";
             <kind>1</kind>
             <string>switch(mode){
     case "":
-        if(keyboard_check_released(ord(1)))
+        if(keyboard_check_released(ord('1')))
             mode = "host";
-        else if(keyboard_check_released(ord(2)))
+        else if(keyboard_check_released(ord('2')))
             mode = "client";
         break;
     case "host":
@@ -73,6 +73,8 @@ port = "";
             ip = "";
             port = "";
         }
+        else
+            port = get_keyboard_input(port, 5);
         break;
     case "client":
         //TODO: handle text input and read it into the ip variable
@@ -87,6 +89,8 @@ port = "";
             ip = "";
             port = "";
         }
+        else
+            ip = get_keyboard_input(ip, 15);
         break;
     case "client_port":
         //TODO: handle text input and read it into the port variable
@@ -101,6 +105,8 @@ port = "";
         }
         else if(keyboard_check_released(vk_escape))
             mode = "client";
+        else
+            port = get_keyboard_input(port, 5);
         break;
 }
 </string>

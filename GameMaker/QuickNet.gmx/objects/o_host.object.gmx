@@ -170,7 +170,7 @@ do {
             for(var i = 0; i &lt; instance_number(o_player); i++)
             {
                 arr[1] = instance_find(o_player, i);
-                qnet_server_sendr_array_int("instance_create", arr);
+                qnet_server_sendr_array_int("!instance_create", arr);
             }
         
             // create a player for that client
@@ -184,7 +184,7 @@ do {
                 var player = instance_find(o_player, i);
                 if(player.player_id == player_id)
                 {
-                    qnet_server_sendr_int("instance_destroy", player);
+                    qnet_server_sendr_int("!instance_destroy", player);
                     instance_destroy(player);
                     break;
                 }

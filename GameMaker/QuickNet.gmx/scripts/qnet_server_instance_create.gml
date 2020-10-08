@@ -4,7 +4,7 @@ if(global.is_host){
     var arr = array_create(2);
     arr[0] = argument2;
     arr[1] = _id;
-    qnet_server_sendr_array_int("instance_create", arr);
+    qnet_server_sendr_array_int("!instance_create", arr);
     
     return _id;
 }
