@@ -184,8 +184,7 @@ do {
                 var player = instance_find(o_player, i);
                 if(player.player_id == player_id)
                 {
-                    qnet_server_sendr_int("!instance_destroy", player);
-                    instance_destroy(player);
+                    qnet_server_instance_destroy(player);
                     break;
                 }
             }
