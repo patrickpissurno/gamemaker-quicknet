@@ -41,7 +41,6 @@ online_count = -1;
 global.ds_map_instances_htc = ds_map_create(); //converts the host's instance ids to client's instance ids
 global.ds_map_instances_cth = ds_map_create(); //converts the client's instance ids to host's instance ids
 
-global.ds_map_xy_changed = ds_map_create();
 global.ds_map_x = ds_map_create();
 global.ds_map_y = ds_map_create();
 global.ds_map_player_id = ds_map_create();
@@ -76,7 +75,6 @@ ds_map_destroy(global.ds_map_instances_cth);
 ds_map_destroy(global.ds_map_x);
 ds_map_destroy(global.ds_map_y);
 ds_map_destroy(global.ds_map_player_id);
-ds_map_destroy(global.ds_map_xy_changed);
 </string>
           </argument>
         </arguments>
@@ -253,16 +251,12 @@ do {
             break;
         default:
             var kmap = qnet_key_is_map(key, "ds_map_x");
-            if(kmap != ""){
+            if(kmap != "")
                 global.ds_map_x[? kmap] = real(value);
-                global.ds_map_xy_changed[? kmap] = true;
-            }
                 
             kmap = qnet_key_is_map(key, "ds_map_y");
-            if(kmap != ""){
+            if(kmap != "")
                 global.ds_map_y[? kmap] = real(value);
-                global.ds_map_xy_changed[? kmap] = true;
-            }
                 
             kmap = qnet_key_is_map(key, "ds_map_player_id");
             if(kmap != "")

@@ -117,7 +117,6 @@ if(!global.is_host)
     ds_map_delete(global.ds_map_x, key);
     ds_map_delete(global.ds_map_y, key);
     ds_map_delete(global.ds_map_player_id, key);
-    ds_map_delete(global.ds_map_xy_changed, key);
 }
 </string>
           </argument>
@@ -178,9 +177,6 @@ if(!global.is_host)
         var _player_id = global.ds_map_player_id[? key];
         var _x = global.ds_map_x[? key];
         var _y = global.ds_map_y[? key];
-        var _xy_changed = global.ds_map_xy_changed[? key];
-        
-        global.ds_map_xy_changed[? key] = false;
         
         if(!is_undefined(_player_id))
             player_id = _player_id;
@@ -189,51 +185,9 @@ if(!global.is_host)
         {
             if(player_id != global.player_id) // instances controlled by other players (entity interpolation)
             {
-                var size = 5;
-                if(!init){
-                    init = true;
-                    last_x = array_create(size);
-                    last_y = array_create(size);
-                    last_xy_garbage = array_create(size);
-                    last_xy_index = 0;
-                    current_step = 0;
-                }
-            
-                if(!is_undefined(_x) &amp;&amp; !is_undefined(_y) &amp;&amp; !is_undefined(_xy_changed))
-                {
-                    if(_xy_changed)
-                    {
-                        last_x[last_xy_index] = _x;
-                        last_y[last_xy_index] = _y;
-                        last_xy_garbage[last_xy_index] = false;
-                    }
-                    
-                    var origin = (last_xy_index - (size - 1)) % size;
-                    if(origin &lt; 0)
-                        origin += size;
-                        
-                    var target = (origin + 1) % size;
-                    if(target &lt; 0)
-                        target += size;
-                        
-                    var max_step = 2.0;
-                        
-                    if(last_xy_garbage[target])
-                    {
-                        target = (target + 1) % size;
-                        max_step += 2.0;
-                    }
-                
-                    x = lerp(last_x[origin], last_x[target], current_step / max_step);
-                    y = lerp(last_y[origin], last_y[target], current_step / max_step);
-                    
-                    if(current_step &gt;= max_step - 1){
-                        last_xy_garbage[origin] = true;
-                        last_xy_index = (last_xy_index + (max_step / 2)) % size;
-                    }
-                    
-                    current_step = (current_step + 1) % max_step;
-                }
+                // simple interpolation
+                x = lerp(x, _x, 0.3);
+                y = lerp(y, _y, 0.3);
             }
             else // instances controlled by this player (those implement client-side prediction and server-reconsiliation)
             {
@@ -452,7 +406,7 @@ if(!global.is_host &amp;&amp; global.player_id == player_id)
           <argument>
             <kind>1</kind>
             <string>///Shared movement code (does not apply changes)
-var spd = 4;
+var spd = 12;
 if(left &amp;&amp; right)
     _hspeed = 0;
 else if(left)
