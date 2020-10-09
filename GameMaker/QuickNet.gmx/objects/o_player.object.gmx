@@ -25,7 +25,41 @@
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>player_id = -1;
+            <string>///Shared code
+player_id = -1;
+
+left = false;
+right = false;
+up = false;
+down = false;
+
+_hspeed = 0;
+_vspeed = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Client code
+if(!global.is_host)
+{
+    init = false;
+}
 </string>
           </argument>
         </arguments>
@@ -112,6 +146,7 @@ if(global.is_host)
     var key = string(id);
     global.ds_map_x[? key] = x;
     global.ds_map_y[? key] = y;
+    global.ds_map_player_id[? key] = player_id;
 }
 </string>
           </argument>
@@ -145,10 +180,120 @@ if(!global.is_host)
         
         if(!is_undefined(_player_id))
             player_id = _player_id;
-        
-        if(!is_undefined(_x) &amp;&amp; !is_undefined(_y)){
-            x = _x;
-            y = _y;
+            
+        if(player_id != global.player_id) // instances controlled by other players
+        {
+            if(!is_undefined(_x) &amp;&amp; !is_undefined(_y)){
+                x = _x;
+                y = _y;
+            }
+        }
+        else // instances controlled by this player (those implement client-side prediction and server-reconsiliation)
+        {
+            if(!init){
+                init = true;
+                last_x = array_create(60);
+                last_y = array_create(60);
+                last_hspeed = array_create(60);
+                last_vspeed = array_create(60);
+                current_step = -1;
+            }
+            
+            if(!is_undefined(_x) &amp;&amp; !is_undefined(_y)){
+                if(current_step == -1) // first position received from the server
+                {
+                    x = _x;
+                    y = _y;
+                    
+                    for(var i = 0; i &lt; 60; i++)
+                    {
+                        last_x[i] = x;
+                        last_y[i] = y;
+                    }
+                    
+                    current_step = 0;
+                }
+
+                var dist = ceil(global.steps_behind_avg);
+                
+                // dist might be a little off, so we search to see if we find the (most approximately) right one
+                var smallest_error = 10000;
+                var smallest_dist = -1;
+                for(var i = -4; i &lt;= 5; i++)
+                {
+                    var test_step = current_step - max(0, dist + i);
+                    if(test_step &lt; 0)
+                        test_step += 60;
+                    test_step = test_step % 60;
+                        
+                    var d = point_distance(_x, _y, last_x[test_step], last_y[test_step]);
+                    if(smallest_dist == -1 || d &lt; smallest_error){
+                        smallest_error = d;
+                        smallest_dist = max(0, dist + i);
+                    }
+                }
+                
+                if(smallest_dist != -1)
+                    dist = smallest_dist;
+            
+                var step = current_step - dist;
+                if(step &lt; 0)
+                    step += 60;
+                
+                last_x[step] = _x;
+                last_y[step] = _y;
+                
+                for(var i = 1; i &lt;= dist; i++)
+                {
+                    var s = (step + i) % 60;
+                    var _s = (step + i - 1) % 60;
+                    
+                    last_x[s] = last_x[_s] + last_hspeed[_s];
+                    last_y[s] = last_y[_s] + last_vspeed[_s];
+                }
+                
+                // correct
+                
+                x = last_x[current_step];
+                y = last_y[current_step];
+                last_hspeed[current_step] = _hspeed;
+                last_vspeed[current_step] = _vspeed;
+                
+                
+                // smoothed only when keys are released
+                /*
+                if(_hspeed == 0)
+                    x = lerp(x, last_x[current_step], 0.75);
+                else
+                    x = last_x[current_step];
+                    
+                if(_vspeed == 0)
+                    y = lerp(y, last_y[current_step], 0.75);
+                else
+                    y = last_y[current_step];
+                    
+                last_hspeed[current_step] = _hspeed;
+                last_vspeed[current_step] = _vspeed;
+                */
+                
+                //smoothed
+                /*
+                if(_hspeed == 0)
+                    x = lerp(x, last_x[current_step], 0.3);
+                else
+                    x = lerp(x, last_x[current_step] + _hspeed, 0.6);
+                    
+                if(_vspeed == 0)
+                    y = lerp(y, last_y[current_step], 0.3);
+                else
+                    y = lerp(y, last_y[current_step] + _vspeed, 0.6);
+                
+                last_hspeed[current_step] = _hspeed;
+                last_vspeed[current_step] = _vspeed;
+                */
+            }
+
+            current_step = (current_step + 1) % 60;
         }
     }
 }
@@ -174,27 +319,13 @@ if(!global.is_host)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Host player's movement code
+            <string>///Host player's input handling
 if(global.is_host &amp;&amp; player_id == 0)
 {
-    var spd = 4;
-    if(keyboard_check(vk_left) &amp;&amp; keyboard_check(vk_right))
-        hspeed = 0;
-    else if(keyboard_check(vk_left))
-        hspeed = -spd;
-    else if(keyboard_check(vk_right))
-        hspeed = spd;
-    else
-        hspeed = 0;
-        
-    if(keyboard_check(vk_up) &amp;&amp; keyboard_check(vk_down))
-        vspeed = 0;
-    else if(keyboard_check(vk_up))
-        vspeed = -spd;
-    else if(keyboard_check(vk_down))
-        vspeed = spd;
-    else
-        vspeed = 0;
+    left = keyboard_check(vk_left);
+    right = keyboard_check(vk_right);
+    up = keyboard_check(vk_up);
+    down = keyboard_check(vk_down);
 }
 </string>
           </argument>
@@ -216,27 +347,106 @@ if(global.is_host &amp;&amp; player_id == 0)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Client player's movement code (actually executed by the host)
+            <string>///Client player's input handling (actually executed by the host)
 if(global.is_host &amp;&amp; player_id &gt; 0)
 {
-    var spd = 4;
-    if(global.keyboard_left[player_id] &amp;&amp; global.keyboard_right[player_id])
-        hspeed = 0;
-    else if(global.keyboard_left[player_id])
-        hspeed = -spd;
-    else if(global.keyboard_right[player_id])
-        hspeed = spd;
-    else
-        hspeed = 0;
-        
-    if(global.keyboard_up[player_id] &amp;&amp; global.keyboard_down[player_id])
-        vspeed = 0;
-    else if(global.keyboard_up[player_id])
-        vspeed = -spd;
-    else if(global.keyboard_down[player_id])
-        vspeed = spd;
-    else
-        vspeed = 0;
+    left = global.keyboard_left[player_id];
+    right = global.keyboard_right[player_id];
+    up = global.keyboard_up[player_id];
+    down = global.keyboard_down[player_id];
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Client-side prediction input handling
+if(!global.is_host &amp;&amp; global.player_id == player_id)
+{
+    left = keyboard_check(vk_left);
+    right = keyboard_check(vk_right);
+    up = keyboard_check(vk_up);
+    down = keyboard_check(vk_down);
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Shared movement code (does not apply changes)
+var spd = 4;
+if(left &amp;&amp; right)
+    _hspeed = 0;
+else if(left)
+    _hspeed = -spd;
+else if(right)
+    _hspeed = spd;
+else
+    _hspeed = 0;
+    
+if(up &amp;&amp; down)
+    _vspeed = 0;
+else if(up)
+    _vspeed = -spd;
+else if(down)
+    _vspeed = spd;
+else
+    _vspeed = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Host movement update code (updates all players positions)
+if(global.is_host)
+{
+    hspeed = _hspeed;
+    vspeed = _vspeed;
 }
 </string>
           </argument>

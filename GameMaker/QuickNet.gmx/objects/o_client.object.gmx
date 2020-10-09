@@ -29,7 +29,10 @@
 global.player_id = -1;
 global.disconnected = "";
 global.step_number = 0;
-global.steps_behind = 0;
+global.steps_behind_size = 30;
+global.steps_behind = array_create(global.steps_behind_size);
+global.steps_behind_index = 0;
+global.steps_behind_avg = 0;
 
 qnet_client_connect(global.ip, global.port);
 
@@ -116,20 +119,10 @@ alarm[11] = 2;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Send client input to the server
+            <string>///Send step_number to host
 if(!global.is_host &amp;&amp; global.player_id &gt; 0)
 {
     qnet_client_sendu_int("!step_number[" + string(global.player_id) + "]", global.step_number);
-
-    var left = keyboard_check(vk_left);
-    var right = keyboard_check(vk_right);
-    var up = keyboard_check(vk_up)
-    var down = keyboard_check(vk_down);
-
-    qnet_client_sendr_bool("keyboard_left[" + string(global.player_id) + "]", left);
-    qnet_client_sendr_bool("keyboard_right[" + string(global.player_id) + "]", right);
-    qnet_client_sendr_bool("keyboard_up[" + string(global.player_id) + "]", up);
-    qnet_client_sendr_bool("keyboard_down[" + string(global.player_id) + "]", down);
 }
 </string>
           </argument>
@@ -155,6 +148,41 @@ if(!global.is_host &amp;&amp; global.player_id &gt; 0)
             <kind>1</kind>
             <string>///Advance global.step_number
 global.step_number += 1;
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="1">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Send client input to the server
+if(!global.is_host &amp;&amp; global.player_id &gt; 0)
+{
+    var left = keyboard_check(vk_left);
+    var right = keyboard_check(vk_right);
+    var up = keyboard_check(vk_up)
+    var down = keyboard_check(vk_down);
+
+    qnet_client_sendr_bool("keyboard_left[" + string(global.player_id) + "]", left);
+    qnet_client_sendr_bool("keyboard_right[" + string(global.player_id) + "]", right);
+    qnet_client_sendr_bool("keyboard_up[" + string(global.player_id) + "]", up);
+    qnet_client_sendr_bool("keyboard_down[" + string(global.player_id) + "]", down);
+}
 </string>
           </argument>
         </arguments>
@@ -235,8 +263,14 @@ do {
                 global.ds_map_player_id[? kmap] = real(value);
                 
             var kindex = qnet_key_is_array(key, "!step_number");
-            if(kindex &gt;= 0 &amp;&amp; kindex == global.player_id)
-                global.steps_behind = (global.step_number - real(value)) / 2;
+            if(kindex &gt;= 0 &amp;&amp; kindex == global.player_id){
+                global.steps_behind[global.steps_behind_index] = max(0, (global.step_number - real(value)) / 2);
+                global.steps_behind_index = (global.steps_behind_index + 1) % global.steps_behind_size;
+                var sum = 0;
+                for(var i = 0; i &lt; global.steps_behind_size; i++)
+                    sum += global.steps_behind[i];
+                global.steps_behind_avg = sum / global.steps_behind_size;
+            }
             break;
     }
 }

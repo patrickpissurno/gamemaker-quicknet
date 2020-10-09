@@ -291,7 +291,7 @@ namespace QuickNet
                     }
                 }
 
-                Thread.Sleep(15);
+                Thread.Sleep(1);
             }
 
             // this method needs to be called in order to be able to start another server later

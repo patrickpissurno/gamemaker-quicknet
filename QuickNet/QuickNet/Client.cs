@@ -202,7 +202,7 @@ namespace QuickNet
                 if(!empty)
                     host.Send(writer, DeliveryMethod.ReliableOrdered);
 
-                Thread.Sleep(15);
+                Thread.Sleep(1);
             }
 
             // this method needs to be called in order to be able to connect to another server later
