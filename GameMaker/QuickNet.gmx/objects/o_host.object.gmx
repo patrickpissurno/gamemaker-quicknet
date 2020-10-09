@@ -33,6 +33,7 @@ connections_count = 0;
 
 global.ds_map_x = ds_map_create();
 global.ds_map_y = ds_map_create();
+global.ds_map_player_id = ds_map_create();
 
 global.keyboard_left = array_create(max_players);
 global.keyboard_right = array_create(max_players);
@@ -71,6 +72,7 @@ qnet_server_start(global.ip, global.port, max_players);
 
 ds_map_destroy(global.ds_map_x);
 ds_map_destroy(global.ds_map_y);
+ds_map_destroy(global.ds_map_player_id);
 </string>
           </argument>
         </arguments>
@@ -123,6 +125,9 @@ for(var key = ds_map_find_first(global.ds_map_x); !is_undefined(key); key = ds_m
 
 for(var key = ds_map_find_first(global.ds_map_y); !is_undefined(key); key = ds_map_find_next(global.ds_map_y, key))
     qnet_server_sendu_float("ds_map_y{" + key + "}", global.ds_map_y[? key]);
+    
+for(var key = ds_map_find_first(global.ds_map_player_id); !is_undefined(key); key = ds_map_find_next(global.ds_map_player_id, key))
+    qnet_server_sendr_int("ds_map_y{" + key + "}", global.ds_map_player_id[? key]);
 </string>
           </argument>
         </arguments>

@@ -54,6 +54,35 @@ if(global.is_host)
     var key = string(id);
     ds_map_delete(global.ds_map_x, key);
     ds_map_delete(global.ds_map_y, key);
+    ds_map_delete(global.ds_map_playetr_id, key);
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Client code
+if(!global.is_host)
+{
+    var key = string(global.ds_map_instances_cth[? string(id)]);
+    ds_map_delete(global.ds_map_x, key);
+    ds_map_delete(global.ds_map_y, key);
+    ds_map_delete(global.ds_map_playetr_id, key);
 }
 </string>
           </argument>
@@ -110,8 +139,17 @@ if(!global.is_host)
     var key = string(global.ds_map_instances_cth[? string(id)]);
     if(!is_undefined(key))
     {
-        x = global.ds_map_x[? key];
-        y = global.ds_map_y[? key];
+        var _x = global.ds_map_x[? key];
+        var _y = global.ds_map_y[? key];
+        var _player_id = global.ds_map_player_id[? key];
+        
+        if(!is_undefined(_player_id))
+            player_id = _player_id;
+        
+        if(!is_undefined(_x) &amp;&amp; !is_undefined(_y)){
+            x = _x;
+            y = _y;
+        }
     }
 }
 </string>

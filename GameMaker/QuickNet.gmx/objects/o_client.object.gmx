@@ -37,6 +37,7 @@ global.ds_map_instances_htc = ds_map_create(); //converts the host's instance id
 global.ds_map_instances_cth = ds_map_create(); //converts the client's instance ids to host's instance ids
 global.ds_map_x = ds_map_create();
 global.ds_map_y = ds_map_create();
+global.ds_map_player_id = ds_map_create();
 
 alarm[11] = 10;
 </string>
@@ -67,6 +68,7 @@ ds_map_destroy(global.ds_map_instances_htc);
 ds_map_destroy(global.ds_map_instances_cth);
 ds_map_destroy(global.ds_map_x);
 ds_map_destroy(global.ds_map_y);
+ds_map_destroy(global.ds_map_player_id);
 </string>
           </argument>
         </arguments>
@@ -198,6 +200,10 @@ do {
             kmap = qnet_key_is_map(key, "ds_map_y");
             if(kmap != "")
                 global.ds_map_y[? kmap] = real(value);
+                
+            kmap = qnet_key_is_map(key, "ds_map_player_id");
+            if(kmap != "")
+                global.ds_map_player_id[? kmap] = real(value);
             break;
     }
 }
