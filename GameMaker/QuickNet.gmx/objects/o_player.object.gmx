@@ -117,6 +117,7 @@ if(!global.is_host)
     ds_map_delete(global.ds_map_x, key);
     ds_map_delete(global.ds_map_y, key);
     ds_map_delete(global.ds_map_player_id, key);
+    ds_map_delete(global.ds_map_xy_changed, key);
 }
 </string>
           </argument>
@@ -174,126 +175,173 @@ if(!global.is_host)
     var key = string(global.ds_map_instances_cth[? string(id)]);
     if(!is_undefined(key))
     {
+        var _player_id = global.ds_map_player_id[? key];
         var _x = global.ds_map_x[? key];
         var _y = global.ds_map_y[? key];
-        var _player_id = global.ds_map_player_id[? key];
+        var _xy_changed = global.ds_map_xy_changed[? key];
+        
+        global.ds_map_xy_changed[? key] = false;
         
         if(!is_undefined(_player_id))
             player_id = _player_id;
             
-        if(player_id != global.player_id) // instances controlled by other players
+        if(player_id &gt;= 0)
         {
-            if(!is_undefined(_x) &amp;&amp; !is_undefined(_y)){
-                x = _x;
-                y = _y;
-            }
-        }
-        else // instances controlled by this player (those implement client-side prediction and server-reconsiliation)
-        {
-            if(!init){
-                init = true;
-                last_x = array_create(60);
-                last_y = array_create(60);
-                last_hspeed = array_create(60);
-                last_vspeed = array_create(60);
-                current_step = -1;
-            }
-            
-            if(!is_undefined(_x) &amp;&amp; !is_undefined(_y)){
-                if(current_step == -1) // first position received from the server
-                {
-                    x = _x;
-                    y = _y;
-                    
-                    for(var i = 0; i &lt; 60; i++)
-                    {
-                        last_x[i] = x;
-                        last_y[i] = y;
-                    }
-                    
+            if(player_id != global.player_id) // instances controlled by other players (entity interpolation)
+            {
+                var size = 5;
+                if(!init){
+                    init = true;
+                    last_x = array_create(size);
+                    last_y = array_create(size);
+                    last_xy_garbage = array_create(size);
+                    last_xy_index = 0;
                     current_step = 0;
                 }
-
-                var dist = ceil(global.steps_behind_avg);
-                
-                // dist might be a little off, so we search to see if we find the (most approximately) right one
-                var smallest_error = 10000;
-                var smallest_dist = -1;
-                for(var i = -4; i &lt;= 5; i++)
-                {
-                    var test_step = current_step - max(0, dist + i);
-                    if(test_step &lt; 0)
-                        test_step += 60;
-                    test_step = test_step % 60;
-                        
-                    var d = point_distance(_x, _y, last_x[test_step], last_y[test_step]);
-                    if(smallest_dist == -1 || d &lt; smallest_error){
-                        smallest_error = d;
-                        smallest_dist = max(0, dist + i);
-                    }
-                }
-                
-                if(smallest_dist != -1)
-                    dist = smallest_dist;
             
-                var step = current_step - dist;
-                if(step &lt; 0)
-                    step += 60;
-                
-                last_x[step] = _x;
-                last_y[step] = _y;
-                
-                for(var i = 1; i &lt;= dist; i++)
+                if(!is_undefined(_x) &amp;&amp; !is_undefined(_y) &amp;&amp; !is_undefined(_xy_changed))
                 {
-                    var s = (step + i) % 60;
-                    var _s = (step + i - 1) % 60;
+                    if(_xy_changed)
+                    {
+                        last_x[last_xy_index] = _x;
+                        last_y[last_xy_index] = _y;
+                        last_xy_garbage[last_xy_index] = false;
+                    }
                     
-                    last_x[s] = last_x[_s] + last_hspeed[_s];
-                    last_y[s] = last_y[_s] + last_vspeed[_s];
+                    var origin = (last_xy_index - (size - 1)) % size;
+                    if(origin &lt; 0)
+                        origin += size;
+                        
+                    var target = (origin + 1) % size;
+                    if(target &lt; 0)
+                        target += size;
+                        
+                    var max_step = 2.0;
+                        
+                    if(last_xy_garbage[target])
+                    {
+                        target = (target + 1) % size;
+                        max_step += 2.0;
+                    }
+                
+                    x = lerp(last_x[origin], last_x[target], current_step / max_step);
+                    y = lerp(last_y[origin], last_y[target], current_step / max_step);
+                    
+                    if(current_step &gt;= max_step - 1){
+                        last_xy_garbage[origin] = true;
+                        last_xy_index = (last_xy_index + (max_step / 2)) % size;
+                    }
+                    
+                    current_step = (current_step + 1) % max_step;
+                }
+            }
+            else // instances controlled by this player (those implement client-side prediction and server-reconsiliation)
+            {
+                if(!init){
+                    init = true;
+                    last_x = array_create(60);
+                    last_y = array_create(60);
+                    last_hspeed = array_create(60);
+                    last_vspeed = array_create(60);
+                    current_step = -1;
                 }
                 
-                // correct
+                if(!is_undefined(_x) &amp;&amp; !is_undefined(_y)){
+                    if(current_step == -1) // first position received from the server
+                    {
+                        x = _x;
+                        y = _y;
+                        
+                        for(var i = 0; i &lt; 60; i++)
+                        {
+                            last_x[i] = x;
+                            last_y[i] = y;
+                        }
+                        
+                        current_step = 0;
+                    }
+    
+                    var dist = ceil(global.steps_behind_avg);
+                    
+                    // dist might be a little off, so we search to see if we find the (most approximately) right one
+                    var smallest_error = 10000;
+                    var smallest_dist = -1;
+                    for(var i = -4; i &lt;= 5; i++)
+                    {
+                        var test_step = current_step - max(0, dist + i);
+                        if(test_step &lt; 0)
+                            test_step += 60;
+                        test_step = test_step % 60;
+                            
+                        var d = point_distance(_x, _y, last_x[test_step], last_y[test_step]);
+                        if(smallest_dist == -1 || d &lt; smallest_error){
+                            smallest_error = d;
+                            smallest_dist = max(0, dist + i);
+                        }
+                    }
+                    
+                    if(smallest_dist != -1)
+                        dist = smallest_dist;
                 
-                x = last_x[current_step];
-                y = last_y[current_step];
-                last_hspeed[current_step] = _hspeed;
-                last_vspeed[current_step] = _vspeed;
-                
-                
-                // smoothed only when keys are released
-                /*
-                if(_hspeed == 0)
-                    x = lerp(x, last_x[current_step], 0.75);
-                else
+                    var step = current_step - dist;
+                    if(step &lt; 0)
+                        step += 60;
+                    
+                    last_x[step] = _x;
+                    last_y[step] = _y;
+                    
+                    for(var i = 1; i &lt;= dist; i++)
+                    {
+                        var s = (step + i) % 60;
+                        var _s = (step + i - 1) % 60;
+                        
+                        last_x[s] = last_x[_s] + last_hspeed[_s];
+                        last_y[s] = last_y[_s] + last_vspeed[_s];
+                    }
+                    
+                    // correct
+                    
                     x = last_x[current_step];
-                    
-                if(_vspeed == 0)
-                    y = lerp(y, last_y[current_step], 0.75);
-                else
                     y = last_y[current_step];
+                    last_hspeed[current_step] = _hspeed;
+                    last_vspeed[current_step] = _vspeed;
                     
-                last_hspeed[current_step] = _hspeed;
-                last_vspeed[current_step] = _vspeed;
-                */
-                
-                //smoothed
-                /*
-                if(_hspeed == 0)
-                    x = lerp(x, last_x[current_step], 0.3);
-                else
-                    x = lerp(x, last_x[current_step] + _hspeed, 0.6);
                     
-                if(_vspeed == 0)
-                    y = lerp(y, last_y[current_step], 0.3);
-                else
-                    y = lerp(y, last_y[current_step] + _vspeed, 0.6);
-                
-                last_hspeed[current_step] = _hspeed;
-                last_vspeed[current_step] = _vspeed;
-                */
+                    // smoothed only when keys are released
+                    /*
+                    if(_hspeed == 0)
+                        x = lerp(x, last_x[current_step], 0.75);
+                    else
+                        x = last_x[current_step];
+                        
+                    if(_vspeed == 0)
+                        y = lerp(y, last_y[current_step], 0.75);
+                    else
+                        y = last_y[current_step];
+                        
+                    last_hspeed[current_step] = _hspeed;
+                    last_vspeed[current_step] = _vspeed;
+                    */
+                    
+                    //smoothed
+                    /*
+                    if(_hspeed == 0)
+                        x = lerp(x, last_x[current_step], 0.3);
+                    else
+                        x = lerp(x, last_x[current_step] + _hspeed, 0.6);
+                        
+                    if(_vspeed == 0)
+                        y = lerp(y, last_y[current_step], 0.3);
+                    else
+                        y = lerp(y, last_y[current_step] + _vspeed, 0.6);
+                    
+                    last_hspeed[current_step] = _hspeed;
+                    last_vspeed[current_step] = _vspeed;
+                    */
+                }
+    
+                current_step = (current_step + 1) % 60;
             }
-
-            current_step = (current_step + 1) % 60;
         }
     }
 }
