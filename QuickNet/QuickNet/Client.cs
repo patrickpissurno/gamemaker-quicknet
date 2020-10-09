@@ -54,19 +54,36 @@ namespace QuickNet
             started = true;
 
             listener.NetworkReceiveEvent += NetworkReceived;
-            listener.NetworkErrorEvent += (s, e) => Disconnect();
+            listener.NetworkErrorEvent += (s, e) => Disconnect(DisconnectReason.Error);
+            listener.PeerDisconnectedEvent += (s, e) => Disconnect(e.Reason == LiteNetLib.DisconnectReason.ConnectionRejected ? DisconnectReason.Full : DisconnectReason.ConnectionFailed);
 
             mainThread = new Thread(MainThread) { IsBackground = true };
             mainThread.Start();
         }
 
-        public void Disconnect()
+        public void Disconnect(DisconnectReason reason = DisconnectReason.Default)
         {
             if (!started || stop)
                 return;
 
             stop = true;
             client.DisconnectAll();
+
+            switch (reason)
+            {
+                case DisconnectReason.Error:
+                    inboundQueue.Enqueue(("disconnected", "connection_error"));
+                    break;
+                case DisconnectReason.Full:
+                    inboundQueue.Enqueue(("disconnected", "server_full"));
+                    break;
+                case DisconnectReason.ConnectionFailed:
+                    if(id == -1)
+                        inboundQueue.Enqueue(("disconnected", "connection_failed"));
+                    else
+                        inboundQueue.Enqueue(("disconnected", "connection_lost"));
+                    break;
+            }
         }
 
         private void CleanupAndReset()
@@ -75,6 +92,7 @@ namespace QuickNet
             client = null;
             listener = null;
             mainThread = null;
+            host = null;
 
             stop = false;
             started = false;
@@ -184,6 +202,14 @@ namespace QuickNet
 
             // this method needs to be called in order to be able to connect to another server later
             CleanupAndReset();
+        }
+
+        internal enum DisconnectReason
+        {
+            Default,
+            Error,
+            Full,
+            ConnectionFailed
         }
     }
 }

@@ -27,6 +27,7 @@
             <kind>1</kind>
             <string>global.is_host = false;
 global.player_id = -1;
+global.disconnected = "";
 
 qnet_client_connect(global.ip, global.port);
 
@@ -166,6 +167,9 @@ do {
         case "online_count":
             online_count = real(value);
             break;
+        case "disconnected":
+            global.disconnected = value;
+            break;
         case "!instance_create":
             var instance_data = qnet_decode_array_number(value);
             var old_instance_id = global.ds_map_instances_htc[? string(instance_data[1])];
@@ -271,7 +275,27 @@ draw_set_halign(fa_left);
 draw_set_valign(fa_top);
 draw_set_font(f_arial_18);
 
-if(global.player_id &lt; 1)
+if(global.disconnected != "")
+{
+    var msg = "Unknown error";
+    switch(global.disconnected)
+    {
+        case "connection_error":
+            msg = "Connection error";
+            break;
+        case "server_full":
+            msg = "Server full";
+            break;
+        case "connection_failed":
+            msg = "Connection failed";
+            break;
+        case "connection_lost":
+            msg = "Lost connection to host";
+            break;
+    }
+    draw_text(20, 20, "Client (" + global.ip + ":" + global.port + ")#" + msg);
+}
+else if(global.player_id &lt; 1)
 {
     draw_text(20, 20, "Client (" + global.ip + ":" + global.port + ")#Attempting to connect...");
 }
