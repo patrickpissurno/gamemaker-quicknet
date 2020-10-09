@@ -147,7 +147,7 @@ if(!global.is_host &amp;&amp; global.player_id &gt; 0)
           <argument>
             <kind>1</kind>
             <string>///Advance global.step_number
-global.step_number += 1;
+global.step_number = (global.step_number + 1) % 600;
 </string>
           </argument>
         </arguments>
@@ -264,7 +264,10 @@ do {
                 
             var kindex = qnet_key_is_array(key, "!step_number");
             if(kindex &gt;= 0 &amp;&amp; kindex == global.player_id){
-                global.steps_behind[global.steps_behind_index] = max(0, (global.step_number - real(value)) / 2);
+                var diff = global.step_number - real(value);
+                if(diff &lt; 0)
+                    diff += 60;
+                global.steps_behind[global.steps_behind_index] = max(0, diff / 2);
                 global.steps_behind_index = (global.steps_behind_index + 1) % global.steps_behind_size;
                 var sum = 0;
                 for(var i = 0; i &lt; global.steps_behind_size; i++)
