@@ -54,7 +54,7 @@ if(global.is_host)
     var key = string(id);
     ds_map_delete(global.ds_map_x, key);
     ds_map_delete(global.ds_map_y, key);
-    ds_map_delete(global.ds_map_playetr_id, key);
+    ds_map_delete(global.ds_map_player_id, key);
 }
 </string>
           </argument>
@@ -82,7 +82,7 @@ if(!global.is_host)
     var key = string(global.ds_map_instances_cth[? string(id)]);
     ds_map_delete(global.ds_map_x, key);
     ds_map_delete(global.ds_map_y, key);
-    ds_map_delete(global.ds_map_playetr_id, key);
+    ds_map_delete(global.ds_map_player_id, key);
 }
 </string>
           </argument>
