@@ -28,6 +28,8 @@
             <string>global.is_host = false;
 global.player_id = -1;
 global.disconnected = "";
+global.step_number = 0;
+global.steps_behind = 0;
 
 qnet_client_connect(global.ip, global.port);
 
@@ -35,6 +37,7 @@ online_count = -1;
 
 global.ds_map_instances_htc = ds_map_create(); //converts the host's instance ids to client's instance ids
 global.ds_map_instances_cth = ds_map_create(); //converts the client's instance ids to host's instance ids
+
 global.ds_map_x = ds_map_create();
 global.ds_map_y = ds_map_create();
 global.ds_map_player_id = ds_map_create();
@@ -116,6 +119,8 @@ alarm[11] = 2;
             <string>///Send client input to the server
 if(!global.is_host &amp;&amp; global.player_id &gt; 0)
 {
+    qnet_client_sendu_int("!step_number[" + string(global.player_id) + "]", global.step_number);
+
     var left = keyboard_check(vk_left);
     var right = keyboard_check(vk_right);
     var up = keyboard_check(vk_up)
@@ -126,6 +131,30 @@ if(!global.is_host &amp;&amp; global.player_id &gt; 0)
     qnet_client_sendr_bool("keyboard_up[" + string(global.player_id) + "]", up);
     qnet_client_sendr_bool("keyboard_down[" + string(global.player_id) + "]", down);
 }
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="2">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Advance global.step_number
+global.step_number += 1;
 </string>
           </argument>
         </arguments>
@@ -204,6 +233,10 @@ do {
             kmap = qnet_key_is_map(key, "ds_map_player_id");
             if(kmap != "")
                 global.ds_map_player_id[? kmap] = real(value);
+                
+            var kindex = qnet_key_is_array(key, "!step_number");
+            if(kindex &gt;= 0 &amp;&amp; kindex == global.player_id)
+                global.steps_behind = (global.step_number - real(value)) / 2;
             break;
     }
 }

@@ -27,7 +27,7 @@
             <kind>1</kind>
             <string>global.is_host = true;
 
-var max_players = 10;
+max_players = 10;
 
 connections_count = 0;
 
@@ -39,6 +39,10 @@ global.keyboard_left = array_create(max_players);
 global.keyboard_right = array_create(max_players);
 global.keyboard_up = array_create(max_players);
 global.keyboard_down = array_create(max_players);
+
+player_step_number = array_create(max_players);
+for(var i = 0; i &lt; max_players; i++)
+    player_step_number[i] = -1;
 
 var player = instance_create(room_width / 2, room_height / 2, o_player);
 player.player_id = 0;
@@ -128,6 +132,11 @@ for(var key = ds_map_find_first(global.ds_map_y); !is_undefined(key); key = ds_m
     
 for(var key = ds_map_find_first(global.ds_map_player_id); !is_undefined(key); key = ds_map_find_next(global.ds_map_player_id, key))
     qnet_server_sendr_int("ds_map_y{" + key + "}", global.ds_map_player_id[? key]);
+    
+for(var i = 1; i &lt; max_players; i++){
+    if(player_step_number[i] &gt;= 0)
+        qnet_server_sendu_int("!step_number[" + string(i) + "]", player_step_number[i]); //TODO: replace with qnet_server_sendu_to_int once it is available
+}
 </string>
           </argument>
         </arguments>
@@ -184,6 +193,7 @@ do {
             break;
         case "disconnected":
             var player_id = real(value);
+            player_step_number[player_id] = -1;
             for(var i = 0; i &lt; instance_number(o_player); i++)
             {
                 var player = instance_find(o_player, i);
@@ -199,6 +209,12 @@ do {
             else if(process_client_keyboard(key, "keyboard_right", value)){}
             else if(process_client_keyboard(key, "keyboard_up", value)){}
             else if(process_client_keyboard(key, "keyboard_down", value)){}
+            else
+            {
+                var kindex = qnet_key_is_array(key, "!step_number");
+                if(kindex &gt;= 0)
+                    player_step_number[kindex] = real(value);
+            }
 
             break;
     }
