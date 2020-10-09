@@ -131,7 +131,7 @@ for(var key = ds_map_find_first(global.ds_map_y); !is_undefined(key); key = ds_m
     qnet_server_sendu_float("ds_map_y{" + key + "}", global.ds_map_y[? key]);
     
 for(var key = ds_map_find_first(global.ds_map_player_id); !is_undefined(key); key = ds_map_find_next(global.ds_map_player_id, key))
-    qnet_server_sendr_int("ds_map_y{" + key + "}", global.ds_map_player_id[? key]);
+    qnet_server_sendr_int("ds_map_player_id{" + key + "}", global.ds_map_player_id[? key]);
     
 for(var i = 1; i &lt; max_players; i++){
     if(player_step_number[i] &gt;= 0)
