@@ -114,6 +114,11 @@ namespace QuickNet
             return id;
         }
 
+        public int GetLatency()
+        {
+            return host?.Ping ?? -1;
+        }
+
         public void ReliablePut(string key, object value)
         {
             if (key[0] == '!' || !outboundCache.ContainsKey(key) || !Utils.CacheEntryEquals(outboundCache[key], value))
