@@ -244,6 +244,8 @@ if(!global.is_host)
                     last_x[step] = _x;
                     last_y[step] = _y;
                     
+                    // re-apply states
+                    
                     for(var i = 1; i &lt;= dist; i++)
                     {
                         var s = (step + i) % 60;
@@ -253,45 +255,33 @@ if(!global.is_host)
                         last_y[s] = last_y[_s] + last_vspeed[_s];
                     }
                     
-                    // correct
+                    // anomaly detector (detects anomalies and recalculates them (leads to small deviations from server position while in movement, but they're corrected once stopped)
+                    // but as a trade-off, prevents much of the rollback while in movement
                     
+                    for(var i = -1; i &lt; 0; i++)
+                    {
+                        var st = current_step + i;
+                        if(st &lt; 0)
+                            st += 60;
+                        st = st % 60;
+                        var st_next = (st + 1) % 60;
+                        
+                        var sx = sign(last_x[st_next] - last_x[st]);
+                        if(sx != 0 &amp;&amp; last_hspeed[st] != 0 &amp;&amp; sign(last_hspeed[st]) != sx){
+                            //debug_log("ANOMALY: " + string(sx) + " " + string(last_hspeed[st]));
+                            last_x[st_next] = last_x[st] + last_hspeed[st];
+                        }
+                        
+                        var sy = sign(last_y[st_next] - last_y[st]);
+                        if(sy != 0 &amp;&amp; last_vspeed[st] != 0 &amp;&amp; sign(last_vspeed[st]) != sy)
+                            last_y[st_next] = last_y[st] + last_vspeed[st];
+                    }
+                    
+                    // update x and y
                     x = last_x[current_step];
                     y = last_y[current_step];
                     last_hspeed[current_step] = _hspeed;
                     last_vspeed[current_step] = _vspeed;
-                    
-                    
-                    // smoothed only when keys are released
-                    /*
-                    if(_hspeed == 0)
-                        x = lerp(x, last_x[current_step], 0.75);
-                    else
-                        x = last_x[current_step];
-                        
-                    if(_vspeed == 0)
-                        y = lerp(y, last_y[current_step], 0.75);
-                    else
-                        y = last_y[current_step];
-                        
-                    last_hspeed[current_step] = _hspeed;
-                    last_vspeed[current_step] = _vspeed;
-                    */
-                    
-                    //smoothed
-                    /*
-                    if(_hspeed == 0)
-                        x = lerp(x, last_x[current_step], 0.3);
-                    else
-                        x = lerp(x, last_x[current_step] + _hspeed, 0.6);
-                        
-                    if(_vspeed == 0)
-                        y = lerp(y, last_y[current_step], 0.3);
-                    else
-                        y = lerp(y, last_y[current_step] + _vspeed, 0.6);
-                    
-                    last_hspeed[current_step] = _hspeed;
-                    last_vspeed[current_step] = _vspeed;
-                    */
                 }
     
                 current_step = (current_step + 1) % 60;
@@ -406,7 +396,7 @@ if(!global.is_host &amp;&amp; global.player_id == player_id)
           <argument>
             <kind>1</kind>
             <string>///Shared movement code (does not apply changes)
-var spd = 12;
+var spd = 4;
 if(left &amp;&amp; right)
     _hspeed = 0;
 else if(left)
