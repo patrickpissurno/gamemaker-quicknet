@@ -556,6 +556,21 @@ namespace QuickNet
             }
         }
 
+        [DllExport("client_get_latency", CallingConvention = CallingConvention.Cdecl)]
+        public static double ClientGetLatency()
+        {
+            try
+            {
+                return Client.GetInstance().GetLatency();
+            }
+            catch (Exception ex)
+            {
+                Utils.Log("Function 'client_get_latency' has thrown an exception. Stack:");
+                Utils.Log(ex);
+                return -1;
+            }
+        }
+
         #region Send Reliable
 
         #region Primitive Types

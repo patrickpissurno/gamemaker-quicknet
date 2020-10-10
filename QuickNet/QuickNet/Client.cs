@@ -114,6 +114,11 @@ namespace QuickNet
             return id;
         }
 
+        public int GetLatency()
+        {
+            return host?.Ping ?? -1;
+        }
+
         public void ReliablePut(string key, object value)
         {
             if (key[0] == '!' || !outboundCache.ContainsKey(key) || !Utils.CacheEntryEquals(outboundCache[key], value))
@@ -197,7 +202,7 @@ namespace QuickNet
                 if(!empty)
                     host.Send(writer, DeliveryMethod.ReliableOrdered);
 
-                Thread.Sleep(15);
+                Thread.Sleep(1);
             }
 
             // this method needs to be called in order to be able to connect to another server later

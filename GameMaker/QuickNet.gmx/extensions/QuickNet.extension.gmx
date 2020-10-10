@@ -662,6 +662,15 @@
             <arg>1</arg>
           </args>
         </function>
+        <function>
+          <name>qnet_client_get_latency</name>
+          <externalName>client_get_latency</externalName>
+          <kind>12</kind>
+          <help>qnet_client_get_latency()</help>
+          <returnType>2</returnType>
+          <argCount>0</argCount>
+          <args/>
+        </function>
       </functions>
       <constants/>
     </file>
