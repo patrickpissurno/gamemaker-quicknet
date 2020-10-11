@@ -21,33 +21,35 @@
       <script>scripts\debug_log.gml</script>
       <script>scripts\get_keyboard_input.gml</script>
     </scripts>
-    <script>scripts\qnet_parse_data.gml</script>
-    <script>scripts\qnet_encode_array.gml</script>
-    <script>scripts\qnet_encode_array_number.gml</script>
-    <script>scripts\qnet_decode_array.gml</script>
-    <script>scripts\qnet_decode_array_number.gml</script>
-    <script>scripts\qnet_key_is_array.gml</script>
-    <script>scripts\qnet_key_is_map.gml</script>
-    <script>scripts\qnet_server_sendr_array.gml</script>
-    <script>scripts\qnet_server_sendr_array_float.gml</script>
-    <script>scripts\qnet_server_sendr_array_int.gml</script>
-    <script>scripts\qnet_server_sendr_array_bool.gml</script>
-    <script>scripts\qnet_client_sendr_array.gml</script>
-    <script>scripts\qnet_client_sendr_array_float.gml</script>
-    <script>scripts\qnet_client_sendr_array_int.gml</script>
-    <script>scripts\qnet_client_sendr_array_bool.gml</script>
-    <script>scripts\qnet_server_sendr_to_array.gml</script>
-    <script>scripts\qnet_server_sendr_to_array_float.gml</script>
-    <script>scripts\qnet_server_sendr_to_array_int.gml</script>
-    <script>scripts\qnet_server_sendr_to_array_bool.gml</script>
-    <script>scripts\qnet_server_sendu_array.gml</script>
-    <script>scripts\qnet_server_sendu_array_float.gml</script>
-    <script>scripts\qnet_server_sendu_array_int.gml</script>
-    <script>scripts\qnet_server_sendu_array_bool.gml</script>
-    <script>scripts\qnet_client_sendu_array.gml</script>
-    <script>scripts\qnet_client_sendu_array_float.gml</script>
-    <script>scripts\qnet_client_sendu_array_int.gml</script>
-    <script>scripts\qnet_client_sendu_array_bool.gml</script>
+    <scripts name="qnet">
+      <script>scripts\qnet_parse_data.gml</script>
+      <script>scripts\qnet_encode_array.gml</script>
+      <script>scripts\qnet_encode_array_number.gml</script>
+      <script>scripts\qnet_decode_array.gml</script>
+      <script>scripts\qnet_decode_array_number.gml</script>
+      <script>scripts\qnet_key_is_array.gml</script>
+      <script>scripts\qnet_key_is_map.gml</script>
+      <script>scripts\qnet_server_sendr_array.gml</script>
+      <script>scripts\qnet_server_sendr_array_int.gml</script>
+      <script>scripts\qnet_server_sendr_array_float.gml</script>
+      <script>scripts\qnet_server_sendr_array_bool.gml</script>
+      <script>scripts\qnet_server_sendr_to_array.gml</script>
+      <script>scripts\qnet_server_sendr_to_array_int.gml</script>
+      <script>scripts\qnet_server_sendr_to_array_float.gml</script>
+      <script>scripts\qnet_server_sendr_to_array_bool.gml</script>
+      <script>scripts\qnet_server_sendu_array.gml</script>
+      <script>scripts\qnet_server_sendu_array_int.gml</script>
+      <script>scripts\qnet_server_sendu_array_float.gml</script>
+      <script>scripts\qnet_server_sendu_array_bool.gml</script>
+      <script>scripts\qnet_client_sendr_array.gml</script>
+      <script>scripts\qnet_client_sendr_array_int.gml</script>
+      <script>scripts\qnet_client_sendr_array_float.gml</script>
+      <script>scripts\qnet_client_sendr_array_bool.gml</script>
+      <script>scripts\qnet_client_sendu_array.gml</script>
+      <script>scripts\qnet_client_sendu_array_int.gml</script>
+      <script>scripts\qnet_client_sendu_array_float.gml</script>
+      <script>scripts\qnet_client_sendu_array_bool.gml</script>
+    </scripts>
   </scripts>
   <fonts name="fonts">
     <font>fonts\f_arial_18</font>
