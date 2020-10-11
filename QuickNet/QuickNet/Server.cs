@@ -52,7 +52,7 @@ namespace QuickNet
 
             started = true;
 
-            inboundQueue.Enqueue(("started", "true"));
+            inboundQueue.Enqueue(("started", "1"));
 
             listener.ConnectionRequestEvent += request =>
             {
