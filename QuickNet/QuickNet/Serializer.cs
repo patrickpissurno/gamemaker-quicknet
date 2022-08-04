@@ -1,10 +1,13 @@
 ﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace QuickNet
 {
     internal static class Serializer
     {
-        public static void SerializeData(NetDataWriter writer, (string key, object data) t)
+        // returns true if mixed mode was used, false otherwise
+        public static void SerializeData(NetDataWriter writer, AppendOnlyDictionary<uint> dict, (string key, object data) t, bool mixedMode = false)
         {
             byte type;
             if (t.data is string _string)
@@ -58,53 +61,95 @@ namespace QuickNet
             else
                 return;
 
-            //TODO: optimize the size needed to transmit the key
-            var key = SubASCIIStringEncoder.GetBytes(t.key);
-            writer.Put((byte)(key.Length - 1));
-            writer.Put(key);
+            if (mixedMode)
+            {
+                var contains = dict.Keys.ContainsKey(t.key);
+
+                writer.Put((byte)(contains ? 0 : 1)); // 0 => uint, 1 => string
+
+                if (contains)
+                {
+                    writer.Put(dict[t.key]);
+                }
+                else
+                {
+                    var key = SubASCIIStringEncoder.GetBytes(t.key);
+                    writer.Put((byte)(key.Length - 1));
+                    writer.Put(key);
+                }
+            }
+            else
+            {
+                writer.Put(dict[t.key]);
+            }
         }
 
-        public static (string key, string data)? DeserializeData(NetDataReader reader)
+        public static (uint id, string key, string data)? DeserializeData(NetDataReader reader, List<string> keys, bool mixedMode = false)
+        {
+            var data = DeserializeValue(reader);
+
+            uint id = uint.MaxValue;
+            string key;
+
+            if(mixedMode)
+            {
+                var mixedType = reader.GetByte();
+                if(mixedType == 0)
+                {
+                    id = reader.GetUInt();
+                    if (id >= keys.Count)
+                        key = null;
+                    else
+                        key = keys[(int)id];
+                }
+                else
+                {
+                    var keyAsBytes = new byte[reader.GetByte() + 1];
+                    reader.GetBytes(keyAsBytes, keyAsBytes.Length);
+                    key = SubASCIIStringEncoder.GetString(keyAsBytes);
+                }
+            }
+            else
+            {
+                id = reader.GetUInt();
+                if (id >= keys.Count)
+                    key = null;
+                else
+                    key = keys[(int)id];
+            }
+
+            if (data == null)
+                return null;
+
+            return (id, key, data);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string DeserializeValue(NetDataReader reader)
         {
             var type = (DataType)reader.GetByte();
-            string data;
 
             switch (type)
             {
                 case DataType.STRING:
-                    data = reader.GetString();
-                    break;
+                    return reader.GetString();
                 case DataType.INT:
-                    data = reader.GetInt().ToString();
-                    break;
+                    return reader.GetInt().ToString();
                 case DataType.DOUBLE:
-                    data = reader.GetDouble().ToString();
-                    break;
+                    return reader.GetDouble().ToString();
                 case DataType.BOOL:
-                    data = (reader.GetBool() ? 1 : 0).ToString();
-                    break;
+                    return (reader.GetBool() ? 1 : 0).ToString();
                 case DataType.ARRAY_STRING:
-                    data = Utils.EncodeArray(reader.GetStringArray());
-                    break;
+                    return Utils.EncodeArray(reader.GetStringArray());
                 case DataType.ARRAY_INT:
-                    data = Utils.EncodeArray(reader.GetIntArray());
-                    break;
+                    return Utils.EncodeArray(reader.GetIntArray());
                 case DataType.ARRAY_DOUBLE:
-                    data = Utils.EncodeArray(reader.GetDoubleArray());
-                    break;
+                    return Utils.EncodeArray(reader.GetDoubleArray());
                 case DataType.ARRAY_BOOL:
-                    data = Utils.EncodeArray(reader.GetBoolArray());
-                    break;
+                    return Utils.EncodeArray(reader.GetBoolArray());
                 default:
                     return null;
             }
-
-            //TODO: optimize the size needed to transmit the key
-            var keyAsBytes = new byte[reader.GetByte() + 1];
-            reader.GetBytes(keyAsBytes, keyAsBytes.Length);
-            var key = SubASCIIStringEncoder.GetString(keyAsBytes);
-
-            return (key, data);
         }
 
         private enum DataType : byte

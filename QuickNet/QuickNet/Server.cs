@@ -27,6 +27,8 @@ namespace QuickNet
         private bool started = false;
         private bool stop = false;
 
+        private ServerIdentifierDictionary identifierDictionary;
+
         private ConcurrentQueue<(string key, string data)> inboundQueue;
         private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
         private AppendOnlyDictionary<(string key, object data)> unreliableOutboundQueue;
@@ -39,6 +41,8 @@ namespace QuickNet
         {
             if (started)
                 return;
+
+            identifierDictionary = new ServerIdentifierDictionary();
 
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
             reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
@@ -73,7 +77,8 @@ namespace QuickNet
                 outboundCache = new Dictionary<string, object>(); //reset global cache
 
                 inboundQueue.Enqueue(("new_connection", (peer.Id + 1).ToString()));
-                client.reliableOutboundQueue.Enqueue(("connected_id", peer.Id + 1));
+
+                ReliablePutTo(peer.Id + 1, "connected_id", peer.Id + 1);
             };
 
             listener.PeerDisconnectedEvent += (peer, e) =>
@@ -91,12 +96,15 @@ namespace QuickNet
         {
             try
             {
+                var type = reader.GetByte();
+                var mixedMode = type == 2;
+
                 while (!reader.EndOfData)
                 {
 
-                    var data = Serializer.DeserializeData(reader);
+                    var data = Serializer.DeserializeData(reader, identifierDictionary.GetKeys(), mixedMode);
                     if (data != null)
-                        inboundQueue.Enqueue(((string key, string data))data);
+                        inboundQueue.Enqueue((data.Value.key, data.Value.data));
                 }
             }
             catch (Exception ex)
@@ -150,6 +158,7 @@ namespace QuickNet
         {
             if (key[0] == '!' || !outboundCache.ContainsKey(key) || !Utils.CacheEntryEquals(outboundCache[key], value))
             {
+                identifierDictionary.Add(key);
                 outboundCache[key] = value;
                 reliableOutboundQueue.Enqueue((key, value));
             }
@@ -193,7 +202,9 @@ namespace QuickNet
                 }
             }
 
-            if(!bypassCache)
+            identifierDictionary.Add(key);
+
+            if (!bypassCache)
                 client.outboundCache[key] = value;
 
             client.reliableOutboundQueue.Enqueue((key, value));
@@ -201,6 +212,7 @@ namespace QuickNet
 
         public void UnreliablePut(string key, object value)
         {
+            identifierDictionary.Add(key);
             unreliableOutboundQueue[key] = (key, value);
         }
 
@@ -219,16 +231,21 @@ namespace QuickNet
                     var empty = true;
                     var writer = new NetDataWriter(true);
 
+                    var dict = identifierDictionary.GetDictionary();
+
                     // unreliable
                     if (unreliableOutboundQueue.Count > 0)
                     {
                         var unreliableQueue = unreliableOutboundQueue;
                         unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
 
+                        if(unreliableQueue.Count > 0)
+                            writer.Put((byte)1); // indicates that this packet doesn't contain a dictionary
+
                         var i = 0;
                         while (i < unreliableQueue.Count)
                         {
-                            Serializer.SerializeData(writer, unreliableQueue.Values[i]);
+                            Serializer.SerializeData(writer, dict, unreliableQueue.Values[i]);
                             empty = false;
                             i++;
                         }
@@ -241,16 +258,33 @@ namespace QuickNet
                     if(!empty)
                         writer.Reset();
                     empty = true;
-                    
+
+                    var peers = server.ConnectedPeerList.ToArray();
+
+                    if(peers.Length < 2)
+                    {
+                        var client = (ClientPeer)peers[0].Tag;
+                        if (client != null)
+                        {
+                            var added = identifierDictionary.SerializeKeysSince(writer, client.identifierDictionaryCount);
+                            client.identifierDictionaryCount += added;
+
+                            if (added == 0)
+                                writer.Put((byte)1); // indicates that this packet doesn't contain a dictionary
+                            else
+                                empty = false;
+                        }
+                        else
+                            writer.Put((byte)1); // indicates that this packet doesn't contain a dictionary
+                    }
+
                     while (reliableOutboundQueue.TryDequeue(out var t))
                     {
-                        Serializer.SerializeData(writer, t);
+                        Serializer.SerializeData(writer, dict, t);
                         empty = false;
                     }
 
-                    var peers = server.ConnectedPeerList;
-
-                    var data = empty || (peers.Count < 2) ? null : writer.CopyData();
+                    var data = empty || (peers.Length < 2) ? null : writer.CopyData();
                     var initialCapacity = data?.Length;
                     var first = true;
 
@@ -258,26 +292,37 @@ namespace QuickNet
                     {
                         var client = (ClientPeer)peer.Tag;
 
-                        if (!first)
+                        var _empty = empty;
+
+                        if (!first || peers.Length >= 2)
                         {
                             if (empty)
-                            {
                                 writer.Reset();
+                            else
+                                writer.Reset((int)initialCapacity);
+
+                            if (client != null)
+                            {
+                                var added = identifierDictionary.SerializeKeysSince(writer, client.identifierDictionaryCount);
+                                client.identifierDictionaryCount += added;
+
+                                if (added == 0)
+                                    writer.Put((byte)1); // indicates that this packet doesn't contain a dictionary
+                                else
+                                    _empty = false;
                             }
                             else
-                            {
-                                writer.Reset((int)initialCapacity);
-                                writer.Put(data);
-                            }
-                        }
+                                writer.Put((byte)1); // indicates that this packet doesn't contain a dictionary
 
-                        var _empty = empty;
+                            if (!empty)
+                                writer.Put(data);
+                        }
 
                         if (client != null)
                         {
                             while (client.reliableOutboundQueue.TryDequeue(out var t))
                             {
-                                Serializer.SerializeData(writer, t);
+                                Serializer.SerializeData(writer, dict, t);
                                 _empty = false;
                             }
                         }

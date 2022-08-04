@@ -28,6 +28,9 @@ namespace QuickNet
         private bool stop = false;
         private int id = -1;
 
+        private ClientIdentifierDictionary identifierDictionary;
+
+        private Queue<(uint id, string data)> pendingInboundQueue;
         private ConcurrentQueue<(string key, string data)> inboundQueue;
         private ConcurrentQueue<(string key, object data)> reliableOutboundQueue;
         private AppendOnlyDictionary<(string key, object data)> unreliableOutboundQueue;
@@ -41,6 +44,9 @@ namespace QuickNet
 
             id = -1;
 
+            identifierDictionary = new ClientIdentifierDictionary();
+
+            pendingInboundQueue = new Queue<(uint id, string data)>();
             inboundQueue = new ConcurrentQueue<(string key, string data)>();
             reliableOutboundQueue = new ConcurrentQueue<(string key, object data)>();
             unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
@@ -137,16 +143,47 @@ namespace QuickNet
         {
             try
             {
+                var type = reader.GetByte();
+
+                if(type == 0) // indicates that this packet contains a dictionary
+                {
+                    identifierDictionary.DeserializeKeys(reader); // update the dictionary
+
+                    var keys = identifierDictionary.GetKeys();
+
+                    // try to process pending messages
+                    while (pendingInboundQueue.Count > 0)
+                    {
+                        var data = pendingInboundQueue.Peek();
+
+                        if (data.id < keys.Count)
+                        {
+                            string key = keys[(int)data.id];
+                            if (key != null)
+                            {
+                                pendingInboundQueue.Dequeue();
+                                inboundQueue.Enqueue((key, data.data));
+                            }
+                            else
+                                break;
+                        }
+                        else
+                            break;
+                    }
+                }
+
                 while (!reader.EndOfData)
                 {
-
-                    var data = Serializer.DeserializeData(reader);
+                    var data = Serializer.DeserializeData(reader, identifierDictionary.GetKeys());
                     if (data != null)
                     {
                         if (id == -1 && data.Value.key == "connected_id")
                             id = int.Parse(data.Value.data);
 
-                        inboundQueue.Enqueue(((string key, string data))data);
+                        if (data.Value.key != null)
+                            inboundQueue.Enqueue((data.Value.key, data.Value.data));
+                        else
+                            pendingInboundQueue.Enqueue((data.Value.id, data.Value.data));
                     }
                 }
             }
@@ -163,12 +200,16 @@ namespace QuickNet
 
         private void MainThread()
         {
+            var tempQueue = new Queue<(string key, object data)>();
             while (!stop)
             {
                 client.PollEvents();
 
                 var empty = true;
                 var writer = new NetDataWriter(true);
+                var mixedMode = false;
+
+                var dict = identifierDictionary.GetDictionary();
 
                 // unreliable
                 if (unreliableOutboundQueue.Count > 0)
@@ -176,10 +217,22 @@ namespace QuickNet
                     var unreliableQueue = unreliableOutboundQueue;
                     unreliableOutboundQueue = new AppendOnlyDictionary<(string key, object data)>();
 
-                    var i = 0;
-                    while (i < unreliableQueue.Count)
+                    var count = unreliableQueue.Count;
+                    for (int _i = 0; _i < count; _i++)
                     {
-                        Serializer.SerializeData(writer, unreliableQueue.Values[i]);
+                        if (!dict.Keys.ContainsKey(unreliableQueue.Values[_i].key))
+                        {
+                            mixedMode = true;
+                            break;
+                        }
+                    }
+
+                    writer.Put((byte)(mixedMode ? 2 : 1));
+
+                    var i = 0;
+                    while (i < count)
+                    {
+                        Serializer.SerializeData(writer, dict, unreliableQueue.Values[i], mixedMode);
                         empty = false;
                         i++;
                     }
@@ -190,17 +243,35 @@ namespace QuickNet
 
                 // reliable
                 if (!empty)
+                {
                     writer.Reset();
+                    writer.Put((byte)1); // indicates that this packet doesn't contain a dictionary
+                }
                 empty = true;
+
+                mixedMode = false;
 
                 while (reliableOutboundQueue.TryDequeue(out var t))
                 {
-                    Serializer.SerializeData(writer, t);
+                    if (!dict.Keys.ContainsKey(t.key))
+                        mixedMode = true;
+
+                    tempQueue.Enqueue(t);
                     empty = false;
                 }
+                
+                while (tempQueue.Count > 0)
+                {
+                    Serializer.SerializeData(writer, dict, tempQueue.Dequeue(), mixedMode);
+                }
 
-                if(!empty)
+                if (!empty)
+                {
+                    if (mixedMode)
+                        writer.Data[0] = 2; // indicates that this packet doesn't contain a dictionary and uses mixed mode
+
                     host.Send(writer, DeliveryMethod.ReliableOrdered);
+                }
 
                 Thread.Sleep(1);
             }
